@@ -1,113 +1,182 @@
+"use client";
+
 import Image from 'next/image'
+import logo from "../public/logo.png"
+import background from "../public/wall.png"
+import start from "../public/start.png"
+import { useEffect, useRef, useState } from 'react'
+import { BiEdit } from "react-icons/bi"
+import { TiTick } from "react-icons/ti"
+import { AiOutlineCopy } from "react-icons/ai"
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { useAppDispatch, useAppSelector } from '@/redux/hooks';
+import { addPlayer, modifyPlayer, reset } from '@/redux/slices/playerSlice';
+import { Player, PlayerDto } from './types';
+import { addMessage } from '@/redux/slices/messageSlice';
+import { Message } from 'postcss';
+import { setSelf } from '@/redux/slices/selfSlice';
+import "./styles/home.css"
 
 export default function Home() {
+  const router = useRouter()
+
+  const dispatch = useAppDispatch();
+  const players = useAppSelector(state => state.players);
+  const self = useAppSelector(state => state.self);
+  const messages = useAppSelector(state => state.messages);
+  const [init, setInit] = useState(false);
+  const [isEditing, setEditing] = useState(false);
+  const [text, setText] = useState("");
+  const inputRef = useRef<HTMLInputElement>(null);
+  const chatRef = useRef(null);
+
+  useEffect(() => {
+    window.addEventListener("mousemove", (e) => {
+      const parallaxes = document.querySelectorAll(".parallax");
+      if (!init) {
+        document.querySelectorAll(".initPos").forEach((el) => {
+          el.classList.remove("initPos")
+        })
+        setInit(true);
+      }
+
+      const xValue = e.clientX - window.innerWidth / 2;
+      const yValue = e.clientY - window.innerHeight / 2;
+
+      const rotateDegreeX = (xValue / (window.innerWidth / 2)) * 20;
+      const rotateDegreeY = (yValue / (window.innerHeight / 2)) * 20;
+
+      parallaxes.forEach(el => {
+        if (el instanceof HTMLElement) {
+          let speedX = el.dataset.speedx as unknown as number;
+          let speedY = el.dataset.speedy as unknown as number;
+          let speedR = el.dataset.rotation as unknown as number;
+          el.style.transform = `rotateY(${rotateDegreeX * speedR}deg) rotateX(${-rotateDegreeY * speedR}deg) translateX(calc(-50% + ${xValue * speedX}px)) translateY(calc(-50% + ${yValue * speedY}px))`
+        }
+      })
+    })
+  }, [])
+
+  const openRoom = () => {
+    (document.getElementById("mainPage") as HTMLElement).style.transform = "translate(0,-100%)";
+  }
+
+  useEffect(() => {
+    // PROBLÉMA: 3.-ként A belép, kap: id: 2, player id 0 kilép, belép B 3.-ként kap: id: 2
+    dispatch(reset());
+    const selfData = { name: `JÁTÉKOS${players.length + 1}`, id: players.length }
+    dispatch(setSelf(selfData))
+    dispatch(addPlayer(selfData))
+    dispatch(addPlayer({ name: "Zsofi" }))
+  }, [])
+
+  const handleInputChange = (event: any) => {
+    const modifiedData = { id: self.id, name: event.target.value } as Player
+    dispatch(setSelf(modifiedData));
+    dispatch(modifyPlayer(modifiedData))
+    updateInputWidth();
+  };
+
+  const handleKeyDown = (event: any) => {
+    if (event.keyCode === 13) {
+      saveName();
+    }
+  }
+
+  const saveName = () => {
+    if (inputRef.current !== null) {
+      inputRef.current.blur();
+      setEditing(false);
+    }
+  }
+
+  const updateInputWidth = () => {
+    if (inputRef.current !== null) {
+      inputRef.current.style.width = "0";
+      inputRef.current.style.width = inputRef.current.scrollWidth + 'px';
+    }
+  };
+
+
+  const handleSendMessage = () => {
+    if (text !== "") {
+      dispatch(addMessage({ sender: self, message: text }))
+      setText("");
+    }
+  }
+
+  useEffect(() => {
+    const chat = document.getElementById("chat") as HTMLElement
+    chat.scrollTop = chat.scrollHeight;
+  }, [messages])
+
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      <div className="z-10 w-full max-w-5xl items-center justify-between font-mono text-sm lg:flex">
-        <p className="fixed left-0 top-0 flex w-full justify-center border-b border-gray-300 bg-gradient-to-b from-zinc-200 pb-6 pt-8 backdrop-blur-2xl dark:border-neutral-800 dark:bg-zinc-800/30 dark:from-inherit lg:static lg:w-auto  lg:rounded-xl lg:border lg:bg-gray-200 lg:p-4 lg:dark:bg-zinc-800/30">
-          Get started by editing&nbsp;
-          <code className="font-mono font-bold">app/page.tsx</code>
-        </p>
-        <div className="fixed bottom-0 left-0 flex h-48 w-full items-end justify-center bg-gradient-to-t from-white via-white dark:from-black dark:via-black lg:static lg:h-auto lg:w-auto lg:bg-none">
-          <a
-            className="pointer-events-none flex place-items-center gap-2 p-8 lg:pointer-events-auto lg:p-0"
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            By{' '}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className="dark:invert"
-              width={100}
-              height={24}
-              priority
-            />
-          </a>
+    <main>
+      <div id='mainPage' className='mainPage'>
+        <Image src={background} className='initPos background parallax' data-speedx="0.02" data-speedy="0.04" data-rotation="0" alt='background' priority unoptimized />
+        <div className='parallax mainDiv initPos' data-speedx="0.07" data-speedy="0.07" data-rotation="0.7">
+          <Image src={logo} className='logo' alt='szerencsekerék logo' />
+          <Image src={start} className='start' data-speedx="0.07" data-speedy="0.07" data-rotation="0.7" alt='szerencsekerék start' onClick={openRoom} />
         </div>
       </div>
-
-      <div className="relative flex place-items-center before:absolute before:h-[300px] before:w-[480px] before:-translate-x-1/2 before:rounded-full before:bg-gradient-radial before:from-white before:to-transparent before:blur-2xl before:content-[''] after:absolute after:-z-20 after:h-[180px] after:w-[240px] after:translate-x-1/3 after:bg-gradient-conic after:from-sky-200 after:via-blue-200 after:blur-2xl after:content-[''] before:dark:bg-gradient-to-br before:dark:from-transparent before:dark:to-blue-700 before:dark:opacity-10 after:dark:from-sky-900 after:dark:via-[#0141ff] after:dark:opacity-40 before:lg:h-[360px]">
-        <Image
-          className="relative dark:drop-shadow-[0_0_0.3rem_#ffffff70] dark:invert"
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
-        />
+      <div className='roomPage'>
+        <div className='outerBorder'>
+          <div className='innerBorder'>
+            <div className='lines'></div>
+            <div className='innerDiv'>
+              <div className='title'>CSATLAKOZOTT JÁTÉKOSOK</div>
+              <div className='joinedPlayers'>
+                {players.map((player) => (
+                  <div key={player.id} className='player'>
+                    {player.id === self.id ?
+                      <>
+                        <input type='text' ref={inputRef} className='selfInput' onBlur={() => { setEditing(false); }} value={self.name || ""} size={4} readOnly={isEditing ? false : true}
+                          onChange={handleInputChange}
+                          onKeyDown={handleKeyDown}
+                        />(ÉN)<div className='modify' onClick={() => {
+                          if (!isEditing) {
+                            setEditing(true);
+                            if (inputRef.current !== null) {
+                              inputRef.current.focus();
+                              inputRef.current.select();
+                            }
+                          } else {
+                            saveName();
+                          }
+                        }}
+                        >{isEditing ? <TiTick /> : <BiEdit />}</div>
+                      </>
+                      :
+                      player.name
+                    }
+                  </div>
+                ))}
+              </div>
+              <div className='roomCode'>SZOBAKÓD: <input className='code' onClick={(e: any) => { e.target.select(); navigator.clipboard.writeText(e.target.value); const copied: any = document.getElementById("copied"); copied.animate([{ opacity: 0 }, { opacity: 1 }, { opacity: 0 }], 1000) }} readOnly value={"41KJJHE2134IBU"}></input><div id='copied' className='copied' style={{ display: "flex", color: "green" }}><AiOutlineCopy /><TiTick /></div></div>
+              <div className='buttons'>
+                <div className='leftPanel'>
+                  <Link href={"/game"} className='controlButton'>JÁTÉK INDÍTÁSA</Link>
+                  <div className='controlButton'>CSATLAKOZÁS MÁSHOVA</div>
+                </div>
+                <div className='rightPanel'>
+                  <div className='chat' id='chat'>
+                    {messages.map((message, index) => {
+                      return <div className='message' key={index} style={{ alignSelf: message.sender.id == self.id ? "flex-end" : "flex-start" }}>
+                        <span style={{ fontWeight: "bolder", color: "#65afa4" }}>{message.sender.name}:</span> {message.message}
+                      </div>
+                    })}
+                  </div>
+                  <div className='chatInput'>
+                    <input ref={chatRef} id='message' placeholder='CSEVEGÉS' value={text} onChange={(e) => { setText(e.target.value) }} onKeyDown={(e) => { if (e.keyCode == 13) handleSendMessage() }} />
+                    <div className='sendButton' onClick={() => handleSendMessage()}>KÜLDÉS</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
-
-      <div className="mb-32 grid text-center lg:mb-0 lg:grid-cols-4 lg:text-left">
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Docs{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Find in-depth information about Next.js features and API.
-          </p>
-        </a>
-
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800 hover:dark:bg-opacity-30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Learn{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Learn about Next.js in an interactive course with&nbsp;quizzes!
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Templates{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Explore the Next.js 13 playground.
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Deploy{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
-      </div>
-    </main>
+    </main >
   )
 }
