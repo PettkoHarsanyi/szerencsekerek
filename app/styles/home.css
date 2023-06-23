@@ -301,3 +301,19 @@ main {
   text-align: left;
   border-radius: 3vh;
 }
+
+.opacityDiv{
+  position: absolute;
+  width: 100vw;
+  height: 100vh;
+  background-color: black;
+  z-index: 5;
+  opacity: 0;
+  visibility: hidden;
+  transition: 1s;
+}
+
+.animateDiv{
+  opacity: 1;
+  visibility: visible;
+}

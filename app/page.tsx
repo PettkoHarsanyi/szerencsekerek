@@ -8,15 +8,14 @@ import { useEffect, useRef, useState } from 'react'
 import { BiEdit } from "react-icons/bi"
 import { TiTick } from "react-icons/ti"
 import { AiOutlineCopy } from "react-icons/ai"
-import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAppDispatch, useAppSelector } from '@/redux/hooks';
 import { addPlayer, modifyPlayer, reset } from '@/redux/slices/playerSlice';
-import { Player, PlayerDto } from './types';
+import { Player } from './types';
 import { addMessage } from '@/redux/slices/messageSlice';
-import { Message } from 'postcss';
 import { setSelf } from '@/redux/slices/selfSlice';
 import "./styles/home.css"
+import { redirect } from 'next/navigation';
 
 export default function Home() {
   const router = useRouter()
@@ -111,8 +110,17 @@ export default function Home() {
     chat.scrollTop = chat.scrollHeight;
   }, [messages])
 
+  const handleStartGame = () => {
+    const opacityDiv = document.getElementById("opacityDiv") as HTMLElement;
+    opacityDiv.classList.add("animateDiv");
+    setTimeout(()=>{
+      router.push("./game");
+    },2000)
+  }
+
   return (
     <main>
+      <div id='opacityDiv' className='opacityDiv'></div>
       <div id='mainPage' className='mainPage'>
         <Image src={background} className='initPos background parallax' data-speedx="0.02" data-speedy="0.04" data-rotation="0" alt='background' priority unoptimized />
         <div className='parallax mainDiv initPos' data-speedx="0.07" data-speedy="0.07" data-rotation="0.7">
@@ -156,7 +164,7 @@ export default function Home() {
               <div className='roomCode'>SZOBAKÓD: <input className='code' onClick={(e: any) => { e.target.select(); navigator.clipboard.writeText(e.target.value); const copied: any = document.getElementById("copied"); copied.animate([{ opacity: 0 }, { opacity: 1 }, { opacity: 0 }], 1000) }} readOnly value={"41KJJHE2134IBU"}></input><div id='copied' className='copied' style={{ display: "flex", color: "green" }}><AiOutlineCopy /><TiTick /></div></div>
               <div className='buttons'>
                 <div className='leftPanel'>
-                  <Link href={"/game"} className='controlButton'>JÁTÉK INDÍTÁSA</Link>
+                  <div className='controlButton' onClick={()=>handleStartGame()}>JÁTÉK INDÍTÁSA</div>
                   <div className='controlButton'>CSATLAKOZÁS MÁSHOVA</div>
                 </div>
                 <div className='rightPanel'>

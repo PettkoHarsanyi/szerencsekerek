@@ -10,7 +10,7 @@ export const players = createSlice({
     reset: () => initialState,
     addPlayer: (state, action: PayloadAction<PlayerDto>) => {
       const { name } = action.payload;
-      state.push({ id: state.length, name })
+      state.push({ id: state.length, name, points: 0})
     },
     removePlayer: (state, action: PayloadAction<number>) => {
       const number = action.payload;
