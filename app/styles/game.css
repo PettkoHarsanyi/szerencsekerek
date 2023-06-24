@@ -9,7 +9,6 @@
 }
 
 .gameDesk{
-    position: absolute;
     bottom: 0;
     height: 150px;
     width: 100vw;
@@ -17,6 +16,7 @@
     display: flex;
     flex-direction: row;
     align-items: center;
+    z-index: 5;
 }
 
 .gamePlayers{
@@ -60,7 +60,7 @@
 .fadeOutDark{
     opacity: 1;
     visibility: visible;
-    transition: 2s ease-in;
+    transition: 1s ease-in;
     position: absolute;
     width: 100vw;
     height: 100vh;
@@ -71,4 +71,143 @@
 .fadedOut{
     opacity: 0;
     visibility: hidden;
+}
+
+.gameLetters{
+    position: relative;
+    background-color: #191d4b;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    gap: 2vh;
+    border-radius: 2vh 2vh 0 0;
+    padding: 2vh 10vh;
+    transform: translate(0,0);
+    transition: 1s ease-in-out;
+    z-index: 4;
+}
+
+.gameLetter{
+    width: 50px;
+    height: 50px;
+    border: 0.5vh solid #00eef0;
+    border-radius: 1vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    color: #00eef0;
+    font-size: 3vh;
+}
+
+.gameLetter:hover{
+    background-color: #00ecf019;
+}
+
+.deskAndLetters{
+    position: absolute;
+    bottom: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.gamePanel{
+    position: absolute;
+    left: 50%;
+    top: 5%;
+    transform: translate(-50%,0);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: inherit;
+}
+
+.gameTitle{
+    background-color: #191d4b;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 2vh;
+    border-radius: 1vh 1vh 0 0;
+}
+
+.screen{
+    background-color: #00eef0;
+    width: 900px;
+    border-radius: 3vh;
+    text-align: center;
+    color: #191d4b;
+    font-size: 2.5vh;
+    font-weight: bold;
+}
+
+.gameBoard{
+    border: 2vh solid #00eef0;
+    border-radius: 4vh;
+    background-color: #191d4b;
+    padding: 0.5vh;
+}
+
+.innerBoard{
+    border: 1vh solid #00eef0;
+    border-radius: 1.5vh;
+    padding: 0.5vh;
+}
+
+.cell{
+    background: linear-gradient(180deg, rgba(67,72,125,1) 0%, #272e76 100%);
+    border-radius: 1vh;
+    width: 90px;
+    height: 90px;
+    border: 1px solid #515475;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position:relative;
+    transition: 1s;
+    overflow: hidden;
+    z-index: 1;
+}
+
+.cellPlaying{
+    background: linear-gradient(169deg, rgba(230,230,230,1) 0%, rgba(138,138,138,1) 100%);
+}
+
+.cellInner{
+    position: absolute;
+    color: black;
+    font-weight: bold;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 5vh;
+    width: 100%;
+    height: 100%;
+    transform: translate(100%,0);
+    transition: 2s ease-in-out;
+    background: linear-gradient(169deg, rgba(230,230,230,1) 0%, rgba(138,138,138,1) 100%);
+    border-radius: 1vh;
+    z-index: 3;
+}
+
+.slideClass{
+    transform: translate(0,0);
+}
+
+.purpleDiv{
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(169deg, #C34FD6 0%, #c673d3 100%) !important;
+    z-index: 2;
+    opacity: 0;
+    transition: 0.5s;
+}
+
+.fadeInPurple{
+    opacity: 1;
 }

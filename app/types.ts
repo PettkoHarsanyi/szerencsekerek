@@ -9,3 +9,8 @@ export type Message = {
     sender: Player,
     message: string
 }
+
+export type Riddle = {
+    title: string,
+    riddle: string,
+}

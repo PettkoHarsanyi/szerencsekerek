@@ -1,7 +1,7 @@
-import { Player, PlayerDto } from "@/app/types";
+import { Player } from "@/app/types";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
-const initialState = {} as Player;
+const initialState = {id:0, name:"Peti",points:0} as Player;
 
 export const self = createSlice({
     name: "self",

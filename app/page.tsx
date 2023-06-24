@@ -64,10 +64,10 @@ export default function Home() {
   useEffect(() => {
     // PROBLÉMA: 3.-ként A belép, kap: id: 2, player id 0 kilép, belép B 3.-ként kap: id: 2
     dispatch(reset());
-    const selfData = { name: `JÁTÉKOS${players.length + 1}`, id: players.length }
-    dispatch(setSelf(selfData))
-    dispatch(addPlayer(selfData))
-    dispatch(addPlayer({ name: "Zsofi" }))
+    // const selfData = { name: `JÁTÉKOS${players.length + 1}`, id: players.length }
+    // dispatch(setSelf(selfData))
+    // dispatch(addPlayer(selfData))
+    // dispatch(addPlayer({ name: "Zsofi" }))
   }, [])
 
   const handleInputChange = (event: any) => {
@@ -112,15 +112,19 @@ export default function Home() {
 
   const handleStartGame = () => {
     const opacityDiv = document.getElementById("opacityDiv") as HTMLElement;
-    opacityDiv.classList.add("animateDiv");
-    setTimeout(()=>{
+    if (opacityDiv) {
+      opacityDiv.classList.add("animateDiv");
+      setTimeout(() => {
+        router.push("./game");
+      }, 1000)
+    } else {
       router.push("./game");
-    },2000)
+    }
   }
 
   return (
     <main>
-      <div id='opacityDiv' className='opacityDiv'></div>
+      {/* <div id='opacityDiv' className='opacityDiv'></div> */}
       <div id='mainPage' className='mainPage'>
         <Image src={background} className='initPos background parallax' data-speedx="0.02" data-speedy="0.04" data-rotation="0" alt='background' priority unoptimized />
         <div className='parallax mainDiv initPos' data-speedx="0.07" data-speedy="0.07" data-rotation="0.7">
@@ -164,7 +168,7 @@ export default function Home() {
               <div className='roomCode'>SZOBAKÓD: <input className='code' onClick={(e: any) => { e.target.select(); navigator.clipboard.writeText(e.target.value); const copied: any = document.getElementById("copied"); copied.animate([{ opacity: 0 }, { opacity: 1 }, { opacity: 0 }], 1000) }} readOnly value={"41KJJHE2134IBU"}></input><div id='copied' className='copied' style={{ display: "flex", color: "green" }}><AiOutlineCopy /><TiTick /></div></div>
               <div className='buttons'>
                 <div className='leftPanel'>
-                  <div className='controlButton' onClick={()=>handleStartGame()}>JÁTÉK INDÍTÁSA</div>
+                  <div className='controlButton' onClick={() => handleStartGame()}>JÁTÉK INDÍTÁSA</div>
                   <div className='controlButton'>CSATLAKOZÁS MÁSHOVA</div>
                 </div>
                 <div className='rightPanel'>
