@@ -57,18 +57,25 @@ export default function Game() {
         if (_riddle) {
             const riddle = _riddle.riddle;
             const riddleSplit = riddle.split(" ");
-            const linesCount = riddle.length <= 14 ? 1 : riddle.length <= 28 ? 2 : riddle.length <= 42 ? 3 : 4;
-            const wordsByLines: string[][] = [...Array(linesCount)].map(arr => []);
+
+            let relativeIndex = 0;
+
+
+            // const linesCount = riddle.length <= 14 ? 1 : riddle.length <= 28 ? 2 : riddle.length <= 42 ? 3 : 4;
+            const wordsByLines : string[][] = [[]];
+            // const wordsByLines: string[][] = [...Array(linesCount)].map(arr => []);
             let currentLine = 0;
 
             riddleSplit.forEach((word: string) => {
                 if ([...wordsByLines[currentLine], word].join(" ").length <= 14) {
                     wordsByLines[currentLine].push(word);
                 } else {
-                    wordsByLines[currentLine + 1].push(word);
+                    wordsByLines.push([word]);
                     currentLine++;
                 }
             })
+
+            const linesCount = wordsByLines.length;
 
             let newTable = [...Array(4)].map((row, rowIndex) => ([...Array(14)].map((cell, cellIndex) => ({ x: rowIndex, y: cellIndex, letter: "", known: false, isPlaying: false }))));
 
@@ -97,7 +104,7 @@ export default function Game() {
 
     const pickRandomRiddle = () => {
         // const index = Math.floor(Math.random() * (gameRiddles.length));
-        const index = 30;
+        const index = 16;
         const riddle = gameRiddles[index];
         // setGameRiddles(()=>gameRiddles.filter((item,itemIndex) => itemIndex !== index));
         setCurrentRiddle(() => riddle);
@@ -133,6 +140,10 @@ export default function Game() {
         }
     }
 
+    const handleBuyVowel = () => {
+        setVovelsShown(!vovelsShown)
+    }
+
     return (
         <div className="gamePage">
             {/* <div id="fadeOutDiv" className="fadeOutDark"></div> */}
@@ -154,10 +165,12 @@ export default function Game() {
                         ))}
                     </div>
                     <div className="gameButtons">
-                        <HiOutlineShoppingCart style={{ color: "#00eef0", fontSize: "4vh" }} />
-                        <div className="gameButton" onClick={(event) => { setVovelsShown(!vovelsShown) }}>
-                            <div>AÁ</div>
-                            <div>50.000</div>
+                        <div className="buyMenu">
+                            <HiOutlineShoppingCart style={{ color: "#00eef0", fontSize: "4vh" }} />
+                            <div id="buyVowelDiv" className="buyVowel" onClick={handleBuyVowel} onMouseOver={document.getElementById("buyVowelDiv")}>
+                                <div>AÁ</div>
+                                <div>50.000</div>
+                            </div>
                         </div>
                     </div>
                 </div>
