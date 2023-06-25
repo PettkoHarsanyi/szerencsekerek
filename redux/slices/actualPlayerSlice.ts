@@ -1,4 +1,4 @@
-import { Player, PlayerDto } from "@/app/types";
+import { Player } from "@/app/types";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 const initialState = {} as Player;

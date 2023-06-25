@@ -14,3 +14,8 @@ export type Riddle = {
     title: string,
     riddle: string,
 }
+
+export type Game = {
+    local: boolean,
+    players?: Player[];
+}

@@ -16,7 +16,10 @@
     display: flex;
     flex-direction: row;
     align-items: center;
-    z-index: 5;
+    justify-content: space-between;
+    z-index: 10;
+    position: relative;
+    overflow: hidden;
 }
 
 .gamePlayers{
@@ -41,6 +44,7 @@
     flex-direction: column;
     line-height: 1.2;
     text-align: center;
+    transition: 0.5s ease-in-out;
 }
 
 .gamePlayer span{
@@ -73,8 +77,29 @@
     visibility: hidden;
 }
 
-.gameLetters{
-    position: relative;
+.gameConsonants{
+    position: absolute;
+    background-color: #191d4b;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    top: 0;
+    left: 50%;
+    gap: 2vh;
+    border-radius: 2vh 2vh 0 0;
+    padding: 2vh 10vh;
+    transform: translate(-50%,-100%);
+    transition: 1s ease-in-out;
+    z-index: 5;
+}
+
+.consonantsHidden{
+    transform: translate(-50%,0);
+}
+
+.gameVowels{
+    position: absolute;
     background-color: #191d4b;
     display: flex;
     flex-direction: row;
@@ -83,9 +108,15 @@
     gap: 2vh;
     border-radius: 2vh 2vh 0 0;
     padding: 2vh 10vh;
-    transform: translate(0,0);
+    top: 0;
+    left: 50%;
+    transform: translate(-50%,0);
     transition: 1s ease-in-out;
     z-index: 4;
+}
+
+.vovelsShown{
+    transform: translate(-50%,-100%);
 }
 
 .gameLetter{
@@ -100,6 +131,8 @@
     color: #00eef0;
     font-size: 3vh;
 }
+
+
 
 .gameLetter:hover{
     background-color: #00ecf019;
@@ -210,4 +243,37 @@
 
 .fadeInPurple{
     opacity: 1;
+}
+
+.gameButtons{
+    background-color: #191d4b;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    gap: 2vh;
+    height: 50%;
+    margin-right: 5vh;
+    border-radius: 3vh;
+    padding: 2vh;
+}
+
+.gameButton{
+    background-color: #191d4b;
+
+    border-width: 0.5vh;
+    border-color: #00eef0;
+
+    padding: 0.5vh;
+    color: #00eef0;
+    font-size: 2vh;
+    font-weight: bold;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    line-height: 1.2;
+    text-align: center;
+    border-radius: 1.5vh;
+    cursor:pointer;
 }

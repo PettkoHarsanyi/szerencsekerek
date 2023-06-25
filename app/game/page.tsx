@@ -8,10 +8,13 @@ import { setActualPlayer } from "@/redux/slices/actualPlayerSlice";
 import axios from "axios";
 import { riddles } from "../assets/riddles";
 import { Riddle } from "../types";
+import { HiOutlineShoppingCart } from "react-icons/hi"
 
 export default function Game() {
     const players = useAppSelector(state => state.players);
     const actualPlayer = useAppSelector(state => state.actualPlayer);
+    const self = useAppSelector(state => state.self)
+    const game = useAppSelector(state => state.game)
     const dispatch = useAppDispatch();
 
     const CONSONANTS = ["b", "c", "d", "f", "g", "h", "j", "k", "l", "m", "n", "p", "r", "s", "t", "v", "y", "z"];
@@ -21,6 +24,8 @@ export default function Game() {
     const [currentRiddle, setCurrentRiddle] = useState<Riddle>();
     const [gameTable, setGameTable] = useState<BoardCell[][]>([])
     const [roundConsonants, setRoundConsonants] = useState(CONSONANTS);
+    const [roundVowels, setRoundVowels] = useState(VOWELS);
+    const [vovelsShown, setVovelsShown] = useState(false);
 
     type BoardCell = {
         x: number,
@@ -99,25 +104,47 @@ export default function Game() {
         return riddle;
     }
 
-    const guessLetter = (letter : string) => {
-        setGameTable(gameTable.map((row,rowIndex)=> row.map((cell,cellIndex)=> {
-            if(cell.letter === letter){
-                return {...cell,known: true}
-            }else{
-                return cell;
-            }
-        })))
-        setRoundConsonants(roundConsonants.filter(cns => cns !== letter));
-    }
+    const guessLetter = (letter: string) => {
 
+        if (game.local || self.id === actualPlayer.id) {
+            if (currentRiddle?.riddle.includes(letter)) {
+
+                setGameTable(gameTable.map((row, rowIndex) => row.map((cell, cellIndex) => {
+                    if (cell.letter === letter) {
+                        return { ...cell, known: true }
+                    } else {
+                        return cell;
+                    }
+                })))
+            } else {
+                const currentPlayerIndex = players.findIndex((player) => player.id === actualPlayer.id);
+                console.log(currentPlayerIndex);
+                dispatch(setActualPlayer(players[(currentPlayerIndex + 1) % players.length]))
+                const borderDivs = document.querySelectorAll(".signal");
+                borderDivs.forEach(div => {
+                    if (div instanceof HTMLElement) {
+                        div.animate([{ borderColor: "red" }, { borderColor: "#00eef0" }], 2000)
+                    }
+                })
+            }
+            setRoundConsonants(roundConsonants.filter(cns => cns !== letter));
+            setRoundVowels(roundVowels.filter(cns => cns !== letter));
+            setVovelsShown(false);
+        }
+    }
 
     return (
         <div className="gamePage">
             {/* <div id="fadeOutDiv" className="fadeOutDark"></div> */}
             <div className="deskAndLetters">
-                <div className="gameLetters">
+                <div className={`gameConsonants ${!game.local ? actualPlayer.id === self.id ? "" : "consonantsHidden" : ""} ${vovelsShown ? "consonantsHidden" : ""}`} >
                     {roundConsonants.map((letter, index) => (
-                        <div className="gameLetter" onClick={()=>guessLetter(letter)} key={index}>{letter.toUpperCase()}</div>
+                        <div className="gameLetter" onClick={() => guessLetter(letter)} key={index}>{letter.toUpperCase()}</div>
+                    ))}
+                </div>
+                <div className={`gameVowels ${vovelsShown ? "vovelsShown" : ""}`} >
+                    {roundVowels.map((letter, index) => (
+                        <div className="gameLetter" onClick={() => guessLetter(letter)} key={index}>{letter.toUpperCase()}</div>
                     ))}
                 </div>
                 <div className="gameDesk">
@@ -125,6 +152,13 @@ export default function Game() {
                         {players.map(player => (
                             <div className={`gamePlayer ${actualPlayer.id === player.id ? "bg-[#ff00fc]" : "bg-[#191d4b]"}`} key={player.id}><div>{player.name.toUpperCase()}<br /><span>{player.points}</span></div></div>
                         ))}
+                    </div>
+                    <div className="gameButtons">
+                        <HiOutlineShoppingCart style={{ color: "#00eef0", fontSize: "4vh" }} />
+                        <div className="gameButton" onClick={(event) => { setVovelsShown(!vovelsShown) }}>
+                            <div>AÁ</div>
+                            <div>50.000</div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -134,14 +168,14 @@ export default function Game() {
                         {currentRiddle?.title.toUpperCase()}
                     </div>
                 </div>
-                <div className="gameBoard">
-                    <div className="innerBoard grid grid-cols-[repeat(14,minmax(0,1fr))] gap-1">
+                <div className="gameBoard signal">
+                    <div className="innerBoard signal grid grid-cols-[repeat(14,minmax(0,1fr))] gap-1">
                         {
                             gameTable && gameTable.length > 0 && gameTable.map((row, rowIndex) => {
                                 return row.map((cell, cellIndex) => {
                                     return <div className={`cell ${cell.isPlaying && cell.letter !== " " ? "cellPlaying" : ""}`} key={(rowIndex * 14) + cellIndex}>
-                                        <div className={`purpleDiv ${cell.known?"fadeInPurple":""}`}></div>
-                                        <div className={`cellInner ${cell.known?"slideClass":""}`}>{cell.known || cell.letter === "," ? cell.letter.toUpperCase() : ""}</div>
+                                        <div className={`purpleDiv ${cell.known ? "fadeInPurple" : ""}`}></div>
+                                        <div className={`cellInner ${cell.known ? "slideClass" : ""}`}>{cell.known || cell.letter === "," ? cell.letter.toUpperCase() : ""}</div>
                                     </div>
                                 })
                             })
@@ -149,6 +183,6 @@ export default function Game() {
                     </div>
                 </div>
             </div>
-        </div>
+        </div >
     )
 }
