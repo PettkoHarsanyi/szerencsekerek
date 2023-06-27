@@ -1,4 +1,4 @@
-.gamePage{
+.gamePage {
     position: relative;
     width: 100vw;
     height: 100vh;
@@ -8,7 +8,7 @@
     background-position: center;
 }
 
-.gameDesk{
+.gameDesk {
     bottom: 0;
     height: 150px;
     width: 100vw;
@@ -22,14 +22,14 @@
     overflow: hidden;
 }
 
-.gamePlayers{
+.gamePlayers {
     height: 50%;
     margin-left: 5vh;
     display: flex;
     flex-direction: row;
 }
 
-.gamePlayer{
+.gamePlayer {
     border-width: 0.8vh 1vh 0.8vh 0;
     border-color: #00eef0;
 
@@ -47,21 +47,21 @@
     transition: 0.5s ease-in-out;
 }
 
-.gamePlayer span{
+.gamePlayer span {
     color: white;
     font-size: 2.5vh;
 }
 
-.gamePlayer:first-of-type{
+.gamePlayer:first-of-type {
     border-left: 0.8vh solid #00eef0;
     border-radius: 3vh 0 0 3vh;
 }
 
-.gamePlayer:last-of-type{
+.gamePlayer:last-of-type {
     border-radius: 0 3vh 3vh 0;
 }
 
-.fadeOutDark{
+.fadeOutDark {
     opacity: 1;
     visibility: visible;
     transition: 1s ease-in;
@@ -72,12 +72,12 @@
     z-index: 5;
 }
 
-.fadedOut{
+.fadedOut {
     opacity: 0;
     visibility: hidden;
 }
 
-.gameConsonants{
+.gameConsonants {
     position: absolute;
     background-color: #191d4b;
     display: flex;
@@ -89,16 +89,16 @@
     gap: 2vh;
     border-radius: 2vh 2vh 0 0;
     padding: 2vh 10vh;
-    transform: translate(-50%,-100%);
+    transform: translate(-50%, -100%);
     transition: 1s ease-in-out;
     z-index: 5;
 }
 
-.consonantsHidden{
-    transform: translate(-50%,0);
+.consonantsHidden {
+    transform: translate(-50%, 0);
 }
 
-.gameVowels{
+.gameVowels {
     position: absolute;
     background-color: #191d4b;
     display: flex;
@@ -110,16 +110,16 @@
     padding: 2vh 10vh;
     top: 0;
     left: 50%;
-    transform: translate(-50%,0);
+    transform: translate(-50%, 0);
     transition: 1s ease-in-out;
     z-index: 4;
 }
 
-.vovelsShown{
-    transform: translate(-50%,-100%);
+.vovelsShown {
+    transform: translate(-50%, -100%);
 }
 
-.gameLetter{
+.gameLetter {
     width: 50px;
     height: 50px;
     border: 0.5vh solid #00eef0;
@@ -134,11 +134,11 @@
 
 
 
-.gameLetter:hover{
+.gameLetter:hover {
     background-color: #00ecf019;
 }
 
-.deskAndLetters{
+.deskAndLetters {
     position: absolute;
     bottom: 0;
     display: flex;
@@ -147,19 +147,20 @@
     align-items: center;
 }
 
-.gamePanel{
+.gamePanel {
     position: absolute;
     left: 50%;
     top: 5%;
-    transform: translate(-50%,0);
+    transform: translate(-50%, 0);
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    width: inherit;
+    width: max-content;
+    z-index: 50;
 }
 
-.gameTitle{
+.gameTitle {
     background-color: #191d4b;
     display: flex;
     justify-content: center;
@@ -168,7 +169,7 @@
     border-radius: 1vh 1vh 0 0;
 }
 
-.screen{
+.screen {
     background-color: #00eef0;
     width: 900px;
     border-radius: 3vh;
@@ -178,21 +179,22 @@
     font-weight: bold;
 }
 
-.gameBoard{
+.gameBoard {
     border: 2vh solid #00eef0;
     border-radius: 4vh;
     background-color: #191d4b;
     padding: 0.5vh;
+    z-index: 15;
 }
 
-.innerBoard{
+.innerBoard {
     border: 1vh solid #00eef0;
     border-radius: 1.5vh;
     padding: 0.5vh;
 }
 
-.cell{
-    background: linear-gradient(180deg, rgba(67,72,125,1) 0%, #272e76 100%);
+.cell {
+    background: linear-gradient(180deg, rgba(67, 72, 125, 1) 0%, #272e76 100%);
     border-radius: 1vh;
     width: 90px;
     height: 90px;
@@ -200,17 +202,52 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    position:relative;
+    position: relative;
     transition: 1s;
     overflow: hidden;
     z-index: 1;
 }
 
-.cellPlaying{
-    background: linear-gradient(169deg, rgba(230,230,230,1) 0%, rgba(138,138,138,1) 100%);
+.solveLetter {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    color: black;
+    font-weight: bold;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 5vh;
+    border-radius: 1vh;
+    text-align: center;
+    animation: animateBorder infinite 2s;
+    background: linear-gradient(169deg, rgba(230, 230, 230, 1) 0%, rgba(138, 138, 138, 1) 100%);
+    border: 0.5vh solid #c673d3;
+    outline: none;
 }
 
-.cellInner{
+@keyframes animateBorder {
+    0% {
+        border: 0.5vh solid #c673d3;
+    }
+
+    50% {
+        border: 0.7vh solid #00eef0;
+    }
+
+    100% {
+        border: 0.5vh solid #c673d3;
+    }
+}
+
+
+.cellPlaying {
+    background: linear-gradient(169deg, rgba(230, 230, 230, 1) 0%, rgba(138, 138, 138, 1) 100%);
+}
+
+.cellInner {
     position: absolute;
     color: black;
     font-weight: bold;
@@ -220,18 +257,18 @@
     font-size: 5vh;
     width: 100%;
     height: 100%;
-    transform: translate(100%,0);
+    transform: translate(100%, 0);
     transition: 2s ease-in-out;
-    background: linear-gradient(169deg, rgba(230,230,230,1) 0%, rgba(138,138,138,1) 100%);
+    background: linear-gradient(169deg, rgba(230, 230, 230, 1) 0%, rgba(138, 138, 138, 1) 100%);
     border-radius: 1vh;
     z-index: 3;
 }
 
-.slideClass{
-    transform: translate(0,0);
+.slideClass {
+    transform: translate(0, 0);
 }
 
-.purpleDiv{
+.purpleDiv {
     position: absolute;
     width: 100%;
     height: 100%;
@@ -239,21 +276,23 @@
     z-index: 2;
     opacity: 0;
     transition: 0.5s;
+    pointer-events: none;
 }
 
-.fadeInPurple{
+.fadeInPurple {
     opacity: 1;
 }
 
-.gameButtons{
-   height: 100%;
-   display: flex;
-   flex-direction: row;
-   justify-content: center;
-   align-items: center;
+.gameButtons {
+    height: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    margin-right: 5vh;
 }
 
-.buyMenu{
+.buyMenu {
     background-color: #191d4b;
     display: flex;
     flex-direction: row;
@@ -266,7 +305,7 @@
     padding: 2vh;
 }
 
-.buyVowel{
+.buyVowel {
     background-color: #191d4b;
 
     border-width: 0.5vh;
@@ -283,5 +322,90 @@
     line-height: 1.2;
     text-align: center;
     border-radius: 1.5vh;
-    cursor:pointer;
+    cursor: pointer;
+}
+
+.fadeDivBg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.fadeDiv {
+    position: absolute;
+    opacity: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: black;
+    z-index: 100;
+}
+
+.solveDiv {
+    opacity: 0;
+    background-color: #191d4b;
+    border-radius: 3vh;
+    width: 50%;
+    height: 50%;
+    z-index: 101;
+
+}
+
+.startSolve {
+    height: 50%;
+    background-color: #191d4b;
+    border: 0.5vh solid #00eef0;
+    border-radius: 2vh;
+    color: #00eef0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 2vh;
+    cursor: pointer;
+}
+
+.solveFade {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: black;
+    z-index: 40;
+    pointer-events: none;
+    transition: 1s;
+}
+
+.solveButtonsDiv {
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translate(-50%, 0);
+    transition: 1s;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+    align-items: flex-start;
+    z-index: 14;
+    width: 90%;
+}
+
+.solveText {
+    background-color: #191d4b;
+    font-size: 3vh;
+    padding: 2vh;
+    text-align: center;
+    border-radius: 0 0 2vh 2vh;
+}
+
+.solveButton {
+    background-color: #191d4b;
+    font-size: 5vh;
+    padding: 2vh;
+    border-radius: 0 0 2vh 2vh;
+    cursor: pointer;
 }
