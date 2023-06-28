@@ -11,6 +11,8 @@ import { BoardCell, Riddle } from "../types";
 import { HiOutlineShoppingCart } from "react-icons/hi"
 import { TiTick } from "react-icons/ti";
 import { ImCross } from "react-icons/im";
+import Image from "next/image";
+import wheel from "../../public/latvanyterv/kerek.png"
 
 export default function Game() {
     const players = useAppSelector(state => state.players);
@@ -29,7 +31,29 @@ export default function Game() {
     const [roundVowels, setRoundVowels] = useState(VOWELS);
     const [vovelsShown, setVovelsShown] = useState(false);
     const [isSolving, setIsSolving] = useState(false);
-    const [solved,setSolved] = useState(false);
+    const [solved, setSolved] = useState(false);
+    const [spinTime, setSpinTime] = useState(true);
+    const [spinZones] = useState<Zone[]>([
+        {deg: 0, value: 75000},{deg:15,value:25000},{deg:30,value:50000},{deg:45,value:200000},
+        {deg:60,value:10000},{deg:75,value:100000},{deg:90,value:25000},{deg:105,value:50000},
+        {deg:120,value:150000},{deg:135,value:25000},{deg:150,value:"CSŐD"},{deg:155,value:1000000},{deg:160,value:"CSŐD"},
+        {deg:165,value:75000},{deg:180,value:10000},{deg:195,value:100000},{deg:210,value:"DUPLÁZÓ"},{deg:225,value:50000},
+        {deg:240,value:10000},{deg:255,value:250000},{deg:270,value:"FELEZŐ"},{deg:285,value:50000},{deg:300,value:75000},
+        {deg:315,value:100000},{deg:330,value:50000},{deg:345,value:150000}
+    ])
+
+    const convertDegToZone = (degree:number) => {
+        const zoneIndex = spinZones.findIndex(zone=> (degree % 360) < zone.deg) - 1
+
+        const zone = spinZones[Math.max(0,zoneIndex)];
+
+        return zone?.value
+    }
+
+    type Zone = {
+        deg: number,
+        value: string | number;
+    }
 
     useEffect(() => {
         if (players.length === 0) {
@@ -84,7 +108,7 @@ export default function Game() {
                         let _x = x;
                         let _y = starterY + i;
 
-                        if(lineText[i] !== " "){
+                        if (lineText[i] !== " ") {
                             newTable[_x][_y] = { x: _x, y: _y, letter: lineText[i], known: false, isPlaying: true }
                         }
                     }
@@ -149,7 +173,7 @@ export default function Game() {
         const inputs = Array.prototype.slice.call(document.querySelectorAll('.solveLetter'));
         const currInput = document.activeElement;
         const currInputIndex = inputs.indexOf(currInput);
-        const nextInputIndex = Math.min((currInputIndex + 1),inputs.length-1) ;
+        const nextInputIndex = Math.min((currInputIndex + 1), inputs.length - 1);
         const prevInputIndex = Math.max((currInputIndex - 1), 0);
 
         if (event.key.length === 1 && event.key.match(/[A-zÀ-ú]/i)) {
@@ -211,11 +235,11 @@ export default function Game() {
             const borderDivs = document.querySelectorAll(".signal");
             borderDivs.forEach(div => {
                 if (div instanceof HTMLElement) {
-                    div.animate([{ borderColor: "green" }, { borderColor: "#00eef0" }, { borderColor: "green" }, { borderColor: "#00eef0" }, { borderColor: "green" }, { borderColor: "#00eef0" }, { borderColor: "green" }, { borderColor: "#00eef0" }, ], 2000)
+                    div.animate([{ borderColor: "green" }, { borderColor: "#00eef0" }, { borderColor: "green" }, { borderColor: "#00eef0" }, { borderColor: "green" }, { borderColor: "#00eef0" }, { borderColor: "green" }, { borderColor: "#00eef0" },], 2000)
                 }
             })
 
-            document.getElementById("gameBoard")?.animate([{backgroundColor: "green"},{backgroundColor: "#191d4b"},{backgroundColor: "green"},{backgroundColor: "#191d4b"},{backgroundColor: "green"},{backgroundColor: "#191d4b"},{backgroundColor: "green"},{backgroundColor: "#191d4b"}],2000)
+            document.getElementById("gameBoard")?.animate([{ backgroundColor: "green" }, { backgroundColor: "#191d4b" }, { backgroundColor: "green" }, { backgroundColor: "#191d4b" }, { backgroundColor: "green" }, { backgroundColor: "#191d4b" }, { backgroundColor: "green" }, { backgroundColor: "#191d4b" }], 2000)
 
             setGameTable(_gameTable);
             setIsSolving(false);
@@ -226,11 +250,11 @@ export default function Game() {
             const borderDivs = document.querySelectorAll(".signal");
             borderDivs.forEach(div => {
                 if (div instanceof HTMLElement) {
-                    div.animate([{ borderColor: "red" }, { borderColor: "black" }, { borderColor: "red" }, { borderColor: "black" }, { borderColor: "red" }, { borderColor: "black" }, { borderColor: "red" }, { borderColor: "#00eef0" }, ], 1500)
+                    div.animate([{ borderColor: "red" }, { borderColor: "black" }, { borderColor: "red" }, { borderColor: "black" }, { borderColor: "red" }, { borderColor: "black" }, { borderColor: "red" }, { borderColor: "#00eef0" },], 1500)
                 }
             })
 
-            document.getElementById("gameBoard")?.animate([{backgroundColor: "red"},{backgroundColor: "#191d4b"},{backgroundColor: "red"},{backgroundColor: "#191d4b"},{backgroundColor: "red"},{backgroundColor: "#191d4b"},{backgroundColor: "red"},{backgroundColor: "#191d4b"}],2000)
+            document.getElementById("gameBoard")?.animate([{ backgroundColor: "red" }, { backgroundColor: "#191d4b" }, { backgroundColor: "red" }, { backgroundColor: "#191d4b" }, { backgroundColor: "red" }, { backgroundColor: "#191d4b" }, { backgroundColor: "red" }, { backgroundColor: "#191d4b" }], 2000)
 
             setIsSolving(false);
         }
@@ -239,9 +263,129 @@ export default function Game() {
     useEffect(() => {
         if (isSolving === true) {
             const div = (document.querySelectorAll(".solveLetter")[0] as HTMLElement)
-            if(div) div.focus();
+            if (div) div.focus();
         }
     }, [isSolving])
+
+    const [isWheelDragged, setWheelDragged] = useState(false);
+    const [startPoint, setStartPoint] = useState<{ x: number, y: number }>({ x: 0, y: 0 });
+    const [currentRotation, setCurrentRotation] = useState(0);
+    const [wheelRotation, setWheelRotation] = useState(0);
+
+    // const rotateWheel = (acceleration: any) => {
+    //     // Elforgatás kiszámítása az egér gyorsulása alapján
+    //     const rotationSpeed = acceleration/50;
+    //     const newRotation = rotation + rotationSpeed;
+
+    //     // Kerék elforgatása
+    //     setRotation(newRotation);
+    // }
+
+    const getMouseRelCenter = (event: any) => {
+        const targetElement = event.currentTarget;
+        const targetRect = targetElement.getBoundingClientRect();
+        const targetCenterX = targetRect.left + targetRect.width / 2;
+        const targetCenterY = targetRect.top + targetRect.height / 2;
+        const relativeMouseX = event.clientX - targetCenterX;
+        const relativeMouseY = event.clientY - targetCenterY;
+
+        return { x: relativeMouseX, y: relativeMouseY }
+    }
+
+    const calculateAngle = (wheelX: number, wheelY: number, mouseStartX: number, mouseStartY: number, mouseStopX: number, mouseStopY: number) => {
+
+
+        // Számítsuk ki az egér kezdő- és végpontjának relatív koordinátáit
+        const startRelativeX = mouseStartX - wheelX;
+        const startRelativeY = mouseStartY - wheelY;
+        const stopRelativeX = mouseStopX - wheelX;
+        const stopRelativeY = mouseStopY - wheelY;
+
+        // Számítsuk ki a szöget az atan2 függvény segítségével
+        const startAngle = Math.atan2(startRelativeY, startRelativeX);
+        const stopAngle = Math.atan2(stopRelativeY, stopRelativeX);
+
+        // Különbség kiszámítása a kezdő- és végpont között
+        let angleDifference = stopAngle - startAngle;
+
+        // Korrekció az esetleges átugrás esetére
+        if (angleDifference < 0) {
+            angleDifference += 2 * Math.PI;
+        }
+
+        // Átkonvertálás fokokba
+        const angleInDegrees = (angleDifference * 180) / Math.PI;
+
+        return angleInDegrees;
+    };
+
+    const [mouseMovePositions, setMouseMovePositions] = useState<any[]>([]);
+    const [spinRotation, setSpinRotation] = useState(0);
+    const [isSpinning, setIsSpinning] = useState(false);
+
+    const [wheelVelocity, setWheelVelocity] = useState(0);
+
+    const getMouseSpeed = (event: any) => {
+        const startPosition = mouseMovePositions[mouseMovePositions.length - 2];
+        const endPosition = mouseMovePositions[mouseMovePositions.length - 1];
+
+        const targetElement = event.currentTarget; // A cél elem, amin az esemény történt
+
+        const targetRect = targetElement.getBoundingClientRect();
+        const targetCenterX = targetRect.left + targetRect.width / 2;
+        const targetCenterY = targetRect.top + targetRect.height / 2;
+        const mouseX = event.clientX;
+        const mouseY = event.clientY;
+        const x1 = startPosition.x - targetCenterX;
+        const y1 = startPosition.y - targetCenterY;
+        const x2 = endPosition.x - targetCenterX;
+        const y2 = endPosition.y - targetCenterY
+
+        const crossProduct = (x1 * y2) - (y1 * x2);
+        let crossDir = 1;
+
+        if (crossProduct > 0) {
+            crossDir = 1;
+        }
+        if (crossProduct < 0) {
+            crossDir = 0;
+        }
+
+        // Kiszámítás a távolság és idő alapján
+        const distance = Math.sqrt(Math.pow(endPosition.x - startPosition.x, 2) + Math.pow(endPosition.y - startPosition.y, 2));
+        const timeElapsed = endPosition.timestamp - startPosition.timestamp;
+
+
+
+        const sqMouseDist = Math.sqrt(Math.pow(mouseX - targetCenterX, 2) + Math.pow(mouseY - targetCenterY, 2));
+
+        const minValue = 0;
+        const maxValue = targetElement.offsetWidth;
+
+        const minInterpolatedValue = 1; // Az interpolált tartomány alsó határa
+        const maxInterpolatedValue = 2;
+
+        const interpolatedValue = minInterpolatedValue + (maxInterpolatedValue - minInterpolatedValue) * (1 - (sqMouseDist - minValue) / (maxValue - minValue));
+
+        // Az egér sebességének meghatározása
+        const velocity = (distance / timeElapsed) * interpolatedValue * crossDir;
+        setWheelVelocity(velocity);
+
+        // Reseteljük az egérmozgás pozícióit tároló tömböt a következő egérmozgás előtt
+        setMouseMovePositions([])
+
+        return velocity
+    }
+
+    useEffect(() => {
+        console.log(isSpinning);
+        if (isSpinning) {
+            setTimeout(() => {
+                setIsSpinning(false);
+                setSpinRotation(0);
+            }, 2000)
+        }
+    }, [isSpinning])
 
     return (
         <div className="gamePage">
@@ -249,12 +393,12 @@ export default function Game() {
             {/* <div id="fadeOutDiv" className="fadeOutDark"></div> */}
             <div className="solveFade" id="solveFade" style={{ opacity: isSolving ? "0.9" : "0" }} />
             <div className="deskAndLetters">
-                <div className={`gameConsonants ${!game.local ? actualPlayer.id === self.id ? "" : "consonantsHidden" : ""} ${vovelsShown ? "consonantsHidden" : ""} ${isSolving ? "consonantsHidden" : ""}`} >
+                <div className={`gameConsonants ${!game.local ? actualPlayer.id === self.id ? "" : "consonantsHidden" : ""} ${vovelsShown ? "consonantsHidden" : ""} ${isSolving ? "consonantsHidden" : ""} ${spinTime ? "consonantsHidden" : ""}`} >
                     {roundConsonants.map((letter, index) => (
                         <div className="gameLetter" onClick={() => guessLetter(letter)} key={index}>{letter.toUpperCase()}</div>
                     ))}
                 </div>
-                <div className={`gameVowels ${vovelsShown && !isSolving ? "vovelsShown" : ""}`} >
+                <div className={`gameVowels ${vovelsShown && !isSolving && !spinTime ? "vovelsShown" : ""}`} >
                     {roundVowels.map((letter, index) => (
                         <div className="gameLetter" onClick={() => guessLetter(letter)} key={index}>{letter.toUpperCase()}</div>
                     ))}
@@ -266,6 +410,7 @@ export default function Game() {
                         ))}
                     </div>
                     <div className="gameButtons">
+                        <div className="spinTime" onClick={() => { setSpinTime(!spinTime); }}>KERÉK</div>
                         <div className="buyMenu">
                             <HiOutlineShoppingCart style={{ color: "#00eef0", fontSize: "4vh" }} />
                             <div id="buyVowelDiv" className="buyVowel" onClick={handleBuyVowel} >
@@ -277,7 +422,7 @@ export default function Game() {
                     </div>
                 </div>
             </div>
-            <div className="gamePanel">
+            <div className="gamePanel" id="gamePanel" style={{ transform: spinTime ? "translate(-50%,-150%)" : "translate(-50%,0)" }}>
                 <div className="gameTitle">
                     <div className="screen">
                         {currentRiddle?.title.toUpperCase()}
@@ -303,6 +448,57 @@ export default function Game() {
                     <div className="solveButton" style={{ color: "red" }} onClick={() => { setIsSolving(false) }}><ImCross /></div>
                     <div className="solveText">Írd be a teljes megfejtést, majd a pipával okézd le.<br />Ha rossz a megfejtés, lenullázódsz.</div>
                     <div className="solveButton" style={{ color: "green" }} onClick={() => { solveRiddle() }}><TiTick /></div>
+                </div>
+            </div>
+            <div className="wheelBg" style={{ transform: spinTime ? "translate(-50%,0)" : "translate(-50%,-150%)", }}>
+                <div className="wheel"
+                    onMouseDown={(event) => {
+                        if (!isSpinning) {
+                            setWheelDragged(true);
+                            setStartPoint({ ...getMouseRelCenter(event) })
+                        }
+                    }}
+                    onMouseMove={(event) => {
+                        if (isWheelDragged && !isSpinning) {
+
+                            const currPoint = getMouseRelCenter(event);
+
+                            const angle = calculateAngle(0, 0, startPoint.x, startPoint.y, currPoint.x, currPoint.y)
+
+                            setCurrentRotation(angle);
+
+                            const { clientX, clientY } = event;
+                            const timestamp = performance.now(); // Az aktuális időbélyeg lekérése
+
+                            // Hozzáadás az egérmozgás pozícióit és időbélyegeit tároló tömbhöz
+                            setMouseMovePositions([...mouseMovePositions, { x: clientX, y: clientY, timestamp }])
+                        }
+                    }}
+                    onMouseUp={(event) => {
+                        if (!isSpinning && isWheelDragged) {
+                            if (mouseMovePositions.length > 3) {
+
+                                const velocity = getMouseSpeed(event)
+                                if (velocity > 0.2) {
+                                    setWheelDragged(false);
+                                    setCurrentRotation(0);
+                                    setSpinRotation(wheelRotation + spinRotation + (velocity * 150))
+                                    setWheelRotation(wheelRotation + spinRotation + (velocity * 150))
+                                    setIsSpinning(true);
+                                    console.log(convertDegToZone(wheelRotation + spinRotation + (velocity * 150)))
+                                    console.log();
+                                } else {
+                                    setWheelDragged(false);
+                                    setCurrentRotation(0);
+                                    setWheelRotation(wheelRotation + currentRotation)
+                                    // setSpinRotation(wheelRotation + spinRotation + (velocity * 150))
+                                    // setWheelRotation(wheelRotation + spinRotation + (velocity * 150) + currentRotation)
+                                }
+                            }
+                        }
+                    }}
+                    style={{ userSelect: "none" }}>
+                    <Image src={wheel} style={{ userSelect: "none", pointerEvents: "none", transition: isSpinning ? `${2}s ease-out` : "none", transform: isSpinning ? `rotate(${spinRotation}deg)` : `rotate(${wheelRotation + currentRotation}deg)` }} alt="wheel" />
                 </div>
             </div>
         </div >
