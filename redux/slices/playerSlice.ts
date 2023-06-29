@@ -18,7 +18,7 @@ export const players = createSlice({
     },
     modifyPlayer: (state, action: PayloadAction<Player>) => {
       const modifiedPlayer = action.payload;
-      return state.map(player => player.id === modifiedPlayer.id ? {...modifiedPlayer,points: player.points} : player)
+      return state.map(player => player.id === modifiedPlayer.id ? {...modifiedPlayer} : player)
     }
   },
 });

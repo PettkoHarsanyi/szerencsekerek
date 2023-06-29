@@ -10,14 +10,22 @@ export const self = createSlice({
         reset: () => initialState,
         setSelf: (state, action: PayloadAction<Player>) => {
             const player = action.payload;
-            console.log(player);
             return player;
         },
+        modifySelf: (state, action: PayloadAction<Player>) => {
+            const player = action.payload;
+            if(player.id === state.id){
+                return player;
+            }else{
+                return state;
+            }
+        }
     },
 });
 
 export const {
     setSelf,
+    modifySelf,
     reset
 } = self.actions;
 export default self.reducer;
