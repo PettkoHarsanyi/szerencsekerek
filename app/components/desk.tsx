@@ -103,12 +103,12 @@ export default function Desk({ spinnedPrize, screenShown }: any) {
 
     return (
         <div className="deskAndLetters" style={{ pointerEvents: canGuess ? "all" : "none" }} >
-            <div className={`gameConsonants ${!game.local ? actualPlayer.id === self.id ? "" : "consonantsHidden" : ""} ${vovelsShown || self.isSolving || game.stage === GameStage.SPINNING || !canGuess /* || game.stage===GameStage.PLACEMENT */ ? "consonantsHidden" : ""}`} >
+            <div className={`gameConsonants ${!game.local ? actualPlayer.id === self.id ? "" : "consonantsHidden" : ""} ${vovelsShown || self.isSolving || game.stage !== GameStage.GUESSING || !canGuess /* || game.stage===GameStage.PLACEMENT */ ? "consonantsHidden" : ""}`} >
                 {roundConsonants.map((letter, index) => (
                     <div className="gameLetter" onClick={() => guessLetter(letter)} key={index}>{letter.toUpperCase()}</div>
                 ))}
             </div>
-            <div className={`gameVowels ${vovelsShown && !self.isSolving && game.stage !== GameStage.SPINNING && canGuess ? "vovelsShown" : ""}`} >
+            <div className={`gameVowels ${vovelsShown && !self.isSolving && game.stage === GameStage.GUESSING && canGuess ? "vovelsShown" : ""}`} >
                 {roundVowels.map((letter, index) => (
                     <div className="gameLetter" onClick={() => guessLetter(letter)} key={index}>{letter.toUpperCase()}</div>
                 ))}
@@ -122,7 +122,7 @@ export default function Desk({ spinnedPrize, screenShown }: any) {
                         {spinnedPrize}
                     </div>
                 </div>
-                <div className="gameButtons" style={{ transform: game.stage === GameStage.SPINNING ? "translate(200%,0)" : "translate(0%,0)" }}>
+                <div className="gameButtons" style={{ transform: game.stage === GameStage.GUESSING ? "translate(0%,0)":"translate(200%,0)" }}>
                     <div className="buyMenu">
                         <HiOutlineShoppingCart style={{ color: "#00eef0", fontSize: "4vh" }} />
                         <div id="buyVowelDiv" className="buyVowel" onClick={handleBuyVowel} onMouseOver={(event) => { event.currentTarget.style.backgroundColor = (!game.local && actualPlayer.points! >= VOVELPRICE) || (actualPlayer.id === self.id && actualPlayer.points! >= VOVELPRICE) ? "green" : "#ff000068" }} onMouseLeave={(event) => { event.currentTarget.style.backgroundColor = "" }}>

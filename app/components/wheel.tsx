@@ -208,16 +208,19 @@ export default function Wheel({ setScreenShown, setSpinnedPrize }: any) {
                     }
                 })
                 setTimeout(() => {
+                    dispatch(setStage(GameStage.PAUSE));
+                }, 2000)
+                setTimeout(() => {
                     dispatch(resetRoundPoints())
                     dispatch(setStage(GameStage.SPINNING))
-                    dispatch(setActualPlayer({...starts,points:0}));
-                }, 2000)
+                    dispatch(setActualPlayer({ ...starts, points: 0 }));
+                }, 3000)
             }
         }
     }, [players])
 
     return (
-        <div className="wheelBg" style={{ transform: game.stage === GameStage.SPINNING || game.stage === GameStage.PLACEMENT ? "translate(-50%,0)" : "translate(-50%,-150%)", }}>
+        <div className="wheelBg" id="wheelBg" style={{ transform: game.stage === GameStage.SPINNING || game.stage === GameStage.PLACEMENT ? "translate(-50%,0)" : "translate(-50%,-150%)", }}>
             <div className="wheel"
                 onMouseDown={(event) => {
                     if (canSpin) {
@@ -264,7 +267,7 @@ export default function Wheel({ setScreenShown, setSpinnedPrize }: any) {
                 <div className="pin">
                     <Image src={pin} alt="pöcök" />
                 </div>
-                <Image src={game.stage === GameStage.PLACEMENT ? startwheel : wheel} style={{ userSelect: "none", pointerEvents: "none", transition: isSpinning ? `${2}s cubic-bezier(0.000, 0.000, 0.315, 1.000)` : "none", transform: isSpinning ? `rotate(${spinRotation}deg)` : `rotate(${wheelRotation + currentRotation}deg)` }} alt="wheel" />
+                <Image src={game.stage === GameStage.PLACEMENT || game.stage === GameStage.PAUSE ? startwheel : wheel} style={{ userSelect: "none", pointerEvents: "none", transition: isSpinning ? `${2}s cubic-bezier(0.000, 0.000, 0.315, 1.000)` : "none", transform: isSpinning ? `rotate(${spinRotation}deg)` : `rotate(${wheelRotation + currentRotation}deg)` }} alt="wheel" />
             </div>
             <div className="wheelShadow"></div>
             <div className="spinButtons" style={{ pointerEvents: canSpin ? isSpinning ? "none" : "all" : "none", transform: canSpin ? "translate(100%,-50%)" : "translate(0,-50%)" }}>

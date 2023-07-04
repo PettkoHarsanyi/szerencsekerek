@@ -1,7 +1,7 @@
 import { BoardCell, Game, GameStage, Player, Riddle } from "@/app/types";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
-const initialState = {local: true, stage: GameStage.SPINNING,gameTable: [],currentRiddle: {riddle:"",title:""},round: 0} as Game;
+const initialState = {local: true, stage: GameStage.PLACEMENT,gameTable: [],currentRiddle: {riddle:"",title:""},round: 0} as Game;
 
 export const game = createSlice({
   name: "game",

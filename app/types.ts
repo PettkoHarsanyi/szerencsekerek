@@ -3,6 +3,7 @@ export type Player = {
     name: string,
     points: number,
     isSolving: boolean,
+    totalPoints: number,
 }
 
 export type Message = {
@@ -41,6 +42,7 @@ export enum GameStage {
     PLACEMENT,
     SPINNING,
     GUESSING,
-    ENDGAME
+    ENDGAME,
+    PAUSE
 }
 

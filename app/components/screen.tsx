@@ -6,7 +6,7 @@ import { setCurrentRiddle, setGameTable, setStage } from "@/redux/slices/gameSli
 import { useEffect, useState } from "react";
 import { setActualPlayer } from "@/redux/slices/actualPlayerSlice";
 import { riddles } from "../assets/riddles";
-import { modifyPlayer } from "@/redux/slices/playerSlice";
+import { modifyPlayer, resetRoundPoints, saveRoundPoints } from "@/redux/slices/playerSlice";
 import { modifySelf, setSolving } from "@/redux/slices/selfSlice";
 
 export default function Screen({ spinnedPrize }: any) {
@@ -188,7 +188,10 @@ export default function Screen({ spinnedPrize }: any) {
 
 
             setTimeout(() => {
-                dispatch(setStage(GameStage.SPINNING))
+                dispatch(resetRoundPoints())
+                dispatch(setStage(GameStage.PLACEMENT));
+                dispatch(setActualPlayer(players[0]));
+                dispatch(saveRoundPoints());
             }, 2000)
             setTimeout(() => {
                 const randomRiddle = pickRandomRiddle()
@@ -197,6 +200,8 @@ export default function Screen({ spinnedPrize }: any) {
 
             dispatch(setGameTable(_gameTable));
             dispatch(setSolving(false))
+
+
         } else {
             // HA NEM TALÁLTA EL
             const borderDivs = document.querySelectorAll(".signal");
