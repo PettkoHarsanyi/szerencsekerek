@@ -17,7 +17,10 @@ export type Riddle = {
 
 export type Game = {
     local: boolean,
-    players?: Player[];
+    round: number,
+    stage: GameStage,
+    currentRiddle: Riddle,
+    gameTable: BoardCell[][],
 }
 
 export type BoardCell = {
@@ -26,4 +29,11 @@ export type BoardCell = {
     letter: string,
     known: boolean,
     isPlaying: boolean,
+}
+
+export enum GameStage {
+    PLACEMENT,
+    SPINNING,
+    GUESSING,
+    ENDGAME
 }

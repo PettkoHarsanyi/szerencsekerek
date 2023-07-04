@@ -62,7 +62,7 @@ export const riddles : Riddle[] = [
         riddle: "tilos a csók a vasútállomáson"
     },
     {
-        title: "kicsitben nem játszom",
+        title: "kicsiben nem játszom",
         riddle: "emelem a tétet"
     },
     {

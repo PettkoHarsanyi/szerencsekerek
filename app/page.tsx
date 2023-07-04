@@ -72,8 +72,8 @@ export default function Home() {
 
   const handleInputChange = (event: any) => {
     const modifiedData = { id: self.id, name: event.target.value } as Player
-    dispatch(setSelf(modifiedData));
-    dispatch(modifyPlayer(modifiedData))
+    dispatch(setSelf({...self,...modifiedData}));
+    dispatch(modifyPlayer({...self,...modifiedData}))
     updateInputWidth();
   };
 
@@ -124,7 +124,7 @@ export default function Home() {
 
   return (
     <main>
-      {/* <div id='opacityDiv' className='opacityDiv'></div> */}
+      <div id='opacityDiv' className='opacityDiv'></div>
       <div id='mainPage' className='mainPage'>
         <Image src={background} className='initPos background parallax' data-speedx="0.02" data-speedy="0.04" data-rotation="0" alt='background' priority unoptimized />
         <div className='parallax mainDiv initPos' data-speedx="0.07" data-speedy="0.07" data-rotation="0.7">
