@@ -2,6 +2,7 @@ export type Player = {
     id?: number,
     name: string,
     points?: number,
+    isSolving?: boolean,
 }
 
 export type Message = {
@@ -31,9 +32,15 @@ export type BoardCell = {
     isPlaying: boolean,
 }
 
+export type Zone = {
+    deg: number,
+    value: string | number;
+}
+
 export enum GameStage {
     PLACEMENT,
     SPINNING,
     GUESSING,
     ENDGAME
 }
+

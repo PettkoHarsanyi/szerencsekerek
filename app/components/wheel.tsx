@@ -9,10 +9,10 @@ import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import wheel from "../../public/latvanyterv/kerek.png"
 import pin from "../../public/pocok.png"
-import { GameStage, Player } from "../types";
+import { GameStage, Player, Zone } from "../types";
 import Image from "next/image";
 
-export default function Wheel({setScreenText, setScreenShown, setSpinnedPrize, spinnedPrize}:any) {
+export default function Wheel({ setScreenShown, setSpinnedPrize }: any) {
     const players = useAppSelector(state => state.players);
     const actualPlayer = useAppSelector(state => state.actualPlayer);
     const game = useAppSelector(state => state.game)
@@ -32,60 +32,16 @@ export default function Wheel({setScreenText, setScreenShown, setSpinnedPrize, s
         { deg: 120, value: 150000 }, { deg: 135, value: 25000 }, { deg: 150, value: "CSŐD" }, { deg: 155, value: 1000000 }, { deg: 160, value: "CSŐD" },
         { deg: 165, value: 75000 }, { deg: 180, value: 10000 }, { deg: 195, value: 100000 }, { deg: 210, value: "DUPLÁZÓ" }, { deg: 225, value: 50000 },
         { deg: 240, value: 10000 }, { deg: 255, value: 250000 }, { deg: 270, value: "FELEZŐ" }, { deg: 285, value: 50000 }, { deg: 300, value: 75000 },
-        { deg: 315, value: 100000 }, { deg: 330, value: 50000 }, { deg: 345, value: 150000 }
+        { deg: 315, value: 100000 }, { deg: 330, value: 50000 }, { deg: 345, value: 150000 }, { deg: 360, value: 75000 }
     ])
 
     const dispatch = useDispatch();
 
     useEffect(() => {
-        if (isSpinning) {
-            setCanSpin(false);
-            setTimeout(() => {
-                setIsSpinning(false);
-                setSpinRotation(0);
-                setScreenText(spinnedPrize);
-                setScreenShown(true);
-                setTimeout(() => {
-                    setScreenShown(false);
-                }, 3000)
-                setTimeout(() => {
-                    if (spinnedPrize !== "CSŐD") {
-                        dispatch(setStage(GameStage.GUESSING))
-                    }
-                }, 1500)
-            }, 2000)
-        }
-    }, [isSpinning])
-
-    useEffect(()=>{
-        if(game.stage === GameStage.SPINNING){
+        if (game.stage === GameStage.SPINNING) {
             setCanSpin(true);
         }
-    },[game])
-
-    useEffect(() => {
-        if (spinnedPrize === "CSŐD") {
-            let toModify: Player = { ...actualPlayer, points: 0 }
-            const currentPlayerIndex = players.findIndex((player) => player.id === actualPlayer.id);
-            dispatch(setActualPlayer(players[(currentPlayerIndex + 1) % players.length]))
-            dispatch(modifyPlayer(toModify))
-            dispatch(modifySelf(toModify));
-            setCanSpin(true);
-            dispatch(setStage(GameStage.SPINNING))
-        }
-        if (spinnedPrize == "FELEZŐ") {
-            let toModify = { ...actualPlayer, points: Math.ceil(actualPlayer.points! / 2) }
-            dispatch(setActualPlayer(toModify))
-            dispatch(modifyPlayer(toModify))
-            dispatch(modifySelf(toModify));
-        }
-        if (spinnedPrize == "DUPLÁZÓ") {
-            let toModify = { ...actualPlayer, points: actualPlayer.points! * 2 }
-            dispatch(setActualPlayer(toModify))
-            dispatch(modifyPlayer(toModify))
-            dispatch(modifySelf(toModify));
-        }
-    }, [spinnedPrize])
+    }, [game])
 
     const getMouseRelCenter = (event: any) => {
         const targetElement = event.currentTarget;
@@ -144,35 +100,79 @@ export default function Wheel({setScreenText, setScreenShown, setSpinnedPrize, s
         const maxInterpolatedValue = 2;
         const interpolatedValue = minInterpolatedValue + (maxInterpolatedValue - minInterpolatedValue) * (1 - (sqMouseDist - minValue) / (maxValue - minValue));
         const velocity = (distance / timeElapsed) * interpolatedValue * crossDir;
-        setMouseMovePositions([])
-
         return velocity
     }
 
     const convertDegToZone = (degree: number) => {
         const zoneIndex = spinZones.findIndex(zone => (degree % 360) < zone.deg) - 1
-
         const zone = spinZones[Math.max(0, zoneIndex)];
-
         return zone?.value
     }
 
-    type Zone = {
-        deg: number,
-        value: string | number;
+    const handleSpinWheel = (speedDeg: number) => {
+        setIsSpinning(true);
+        setCanSpin(false);
+        setSpinRotation(speedDeg)
+        setWheelRotation(speedDeg)
+        const _spinnedPrize = convertDegToZone(speedDeg)
+        // const _spinnedPrize : string = "DUPLÁZÓ";
+        setSpinnedPrize(_spinnedPrize);
+
+        if (_spinnedPrize === "CSŐD") {
+            let toModify: Player = { ...actualPlayer, points: 0 }
+            const currentPlayerIndex = players.findIndex((player) => player.id === actualPlayer.id);
+            setTimeout(()=>{
+                dispatch(setActualPlayer(players[(currentPlayerIndex + 1) % players.length]))
+                dispatch(modifyPlayer(toModify))
+                dispatch(modifySelf(toModify));
+                dispatch(setStage(GameStage.SPINNING))
+            },5000)
+        } else if (_spinnedPrize === "FELEZŐ") {
+            let toModify = { ...actualPlayer, points: Math.ceil(actualPlayer.points! / 2) }
+            setTimeout(()=>{
+                dispatch(setActualPlayer(toModify))
+                dispatch(modifyPlayer(toModify))
+                dispatch(modifySelf(toModify));
+
+            },5000)
+        } else if (_spinnedPrize == "DUPLÁZÓ") {
+            let toModify = { ...actualPlayer, points: actualPlayer.points! * 2 }
+            setTimeout(()=>{
+                dispatch(setActualPlayer(toModify))
+                dispatch(modifyPlayer(toModify))
+                dispatch(modifySelf(toModify));
+            },5000)
+        }
+
+        setTimeout(() => {
+            setIsSpinning(false);
+            setSpinRotation(0);
+            setScreenShown(true);
+        }, 2000)
+
+        setTimeout(() => {
+            if (_spinnedPrize !== "CSŐD") {
+                dispatch(setStage(GameStage.GUESSING))
+            }
+        }, 3500)
+
+        setTimeout(() => {
+            setScreenShown(false);
+        }, 5000)
     }
 
     return (
-        <div className="wheelBg" style={{ transform: game.stage === GameStage.SPINNING ? "translate(-50%,0)" : "translate(-50%,-150%)", }}>
+        <div className="wheelBg" style={{ transform: game.stage === GameStage.SPINNING || game.stage === GameStage.PLACEMENT ? "translate(-50%,0)" : "translate(-50%,-150%)", }}>
             <div className="wheel"
                 onMouseDown={(event) => {
-                    if (!isSpinning && canSpin) {
+                    if (canSpin) {
                         setWheelDragged(true);
                         setStartPoint({ ...getMouseRelCenter(event) })
+                        setMouseMovePositions([])
                     }
                 }}
                 onMouseMove={(event) => {
-                    if (isWheelDragged && !isSpinning && canSpin) {
+                    if (isWheelDragged && canSpin) {
 
                         const currPoint = getMouseRelCenter(event);
 
@@ -188,20 +188,15 @@ export default function Wheel({setScreenText, setScreenShown, setSpinnedPrize, s
                     }
                 }}
                 onMouseUp={(event) => {
-                    if (!isSpinning && isWheelDragged && canSpin) {
+                    if (isWheelDragged && canSpin) {
                         if (mouseMovePositions.length > 3) {
 
                             const velocity = getMouseSpeed(event)
                             if (velocity > 0.2) {
                                 setWheelDragged(false);
                                 setCurrentRotation(0);
-                                setSpinRotation(wheelRotation + spinRotation + (velocity * 150))
-                                setWheelRotation(wheelRotation + spinRotation + (velocity * 150))
-                                setIsSpinning(true);
 
-
-                                setSpinnedPrize(convertDegToZone(wheelRotation + spinRotation + (velocity * 150)))
-
+                                handleSpinWheel(wheelRotation + spinRotation + (velocity * 150));
                             } else {
                                 setWheelDragged(false);
                                 setCurrentRotation(0);
@@ -220,26 +215,15 @@ export default function Wheel({setScreenText, setScreenShown, setSpinnedPrize, s
             <div className="spinButtons" style={{ pointerEvents: canSpin ? isSpinning ? "none" : "all" : "none", transform: canSpin ? "translate(100%,-50%)" : "translate(0,-50%)" }}>
                 <div className="soft spinButton" onClick={() => {
                     const randomSoft = Math.random() * (170 - 50) + 50;
-                    setIsSpinning(true);
-                    setSpinRotation(wheelRotation + randomSoft);
-                    setWheelRotation(wheelRotation + randomSoft)
-                    setSpinnedPrize(convertDegToZone(wheelRotation + randomSoft))
-
+                    handleSpinWheel(wheelRotation + randomSoft)
                 }}>GYENGE</div>
                 <div className="medium spinButton" onClick={() => {
                     const randomMedium = Math.random() * (400 - 170) + 170;
-                    setIsSpinning(true);
-                    setSpinRotation(wheelRotation + randomMedium);
-                    setWheelRotation(wheelRotation + randomMedium)
-                    setSpinnedPrize(convertDegToZone(wheelRotation + randomMedium))
-
+                    handleSpinWheel(wheelRotation + randomMedium)
                 }}>KÖZEPES</div>
                 <div className="hard spinButton" onClick={() => {
                     const randomHard = Math.random() * (1000 - 500) + 500;
-                    setIsSpinning(true);
-                    setSpinRotation(wheelRotation + randomHard);
-                    setWheelRotation(wheelRotation + randomHard)
-                    setSpinnedPrize(convertDegToZone(wheelRotation + randomHard))
+                    handleSpinWheel(wheelRotation + randomHard)
                 }}>ERŐS</div>
             </div>
         </div>

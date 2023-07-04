@@ -1,13 +1,13 @@
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { useEffect, useState } from "react";
-import { GameStage } from "../types";
+import { GameStage, Player } from "../types";
 import { setGameTable, setStage } from "@/redux/slices/gameSlice";
 import { setActualPlayer } from "@/redux/slices/actualPlayerSlice";
 import { modifyPlayer } from "@/redux/slices/playerSlice";
-import { modifySelf } from "@/redux/slices/selfSlice";
+import { modifySelf, setSolving } from "@/redux/slices/selfSlice";
 import { HiOutlineShoppingCart } from "react-icons/hi";
 
-export default function Desk({addPrizeToPlayer,spinnedPrize,screenShown,screenText,isSolving,setIsSolving}:any) {
+export default function Desk({ spinnedPrize, screenShown }: any) {
     const CONSONANTS = ["b", "c", "d", "f", "g", "h", "j", "k", "l", "m", "n", "p", "r", "s", "t", "v", "y", "z"];
     const VOWELS = ["a", "á", "e", "é", "i", "í", "u", "ú", "ü", "ű", "o", "ó", "ö", "ő"];
     const VOVELPRICE = 100000;
@@ -27,19 +27,30 @@ export default function Desk({addPrizeToPlayer,spinnedPrize,screenShown,screenTe
         if (game.stage === GameStage.GUESSING) {
             setCanGuess(true);
         }
-    }, [game])
+    }, [game.stage])
 
-    useEffect(()=>{
+    useEffect(() => {
         setRoundConsonants(CONSONANTS);
         setRoundVowels(VOWELS);
-    },[game.round])
+    }, [game.round])
+
+    const addPrizeToPlayer = (prize: any, multiplier: number = 1) => {
+        if (prize && !isNaN(prize)) {
+            let toModify: Player = { ...actualPlayer, points: actualPlayer.points! + (prize * multiplier) }
+            dispatch(setActualPlayer(toModify))
+            dispatch(modifyPlayer(toModify))
+            dispatch(modifySelf(toModify));
+        }
+    }
+
+
 
     const guessLetter = (letter: string) => {
         setCanGuess(false);
         if (game.local || self.id === actualPlayer.id) {
             if (game.currentRiddle?.riddle.includes(letter)) {
                 // HA VAN BENNE OLYAN BETŰ
-                dispatch(setGameTable(game.gameTable.map((row:any) => row.map((cell:any) => {
+                dispatch(setGameTable(game.gameTable.map((row: any) => row.map((cell: any) => {
                     if (cell.letter === letter) {
                         return { ...cell, known: true }
                     } else {
@@ -47,7 +58,7 @@ export default function Desk({addPrizeToPlayer,spinnedPrize,screenShown,screenTe
                     }
                 }))))
 
-                let timeOfOccurance = game.currentRiddle?.riddle.split("").reduce((count:any, character:string) => {
+                let timeOfOccurance = game.currentRiddle?.riddle.split("").reduce((count: any, character: string) => {
                     if (character === letter) {
                         return count + 1;
                     }
@@ -82,7 +93,7 @@ export default function Desk({addPrizeToPlayer,spinnedPrize,screenShown,screenTe
         }
     }
 
-    
+
     const handleModifyPlayer = (id: number, data: any) => {
         const player = { ...players.find(plyr => plyr.id === id), ...data }
         dispatch(setActualPlayer(player))
@@ -92,12 +103,12 @@ export default function Desk({addPrizeToPlayer,spinnedPrize,screenShown,screenTe
 
     return (
         <div className="deskAndLetters" style={{ pointerEvents: canGuess ? "all" : "none" }} >
-            <div className={`gameConsonants ${!game.local ? actualPlayer.id === self.id ? "" : "consonantsHidden" : ""} ${vovelsShown || isSolving || game.stage === GameStage.SPINNING || !canGuess /* || game.stage===GameStage.PLACEMENT */ ? "consonantsHidden" : ""}`} >
+            <div className={`gameConsonants ${!game.local ? actualPlayer.id === self.id ? "" : "consonantsHidden" : ""} ${vovelsShown || self.isSolving || game.stage === GameStage.SPINNING || !canGuess /* || game.stage===GameStage.PLACEMENT */ ? "consonantsHidden" : ""}`} >
                 {roundConsonants.map((letter, index) => (
                     <div className="gameLetter" onClick={() => guessLetter(letter)} key={index}>{letter.toUpperCase()}</div>
                 ))}
             </div>
-            <div className={`gameVowels ${vovelsShown && !isSolving && game.stage !== GameStage.SPINNING && canGuess ? "vovelsShown" : ""}`} >
+            <div className={`gameVowels ${vovelsShown && !self.isSolving && game.stage !== GameStage.SPINNING && canGuess ? "vovelsShown" : ""}`} >
                 {roundVowels.map((letter, index) => (
                     <div className="gameLetter" onClick={() => guessLetter(letter)} key={index}>{letter.toUpperCase()}</div>
                 ))}
@@ -108,7 +119,7 @@ export default function Desk({addPrizeToPlayer,spinnedPrize,screenShown,screenTe
                         <div className={`gamePlayer ${actualPlayer.id === player.id ? "bg-[#ff00fc]" : "bg-[#191d4b]"}`} key={player.id}><div>{player.name.toUpperCase()}<br /><span>{player.points}</span></div></div>
                     ))}
                     <div className="prizeScreen" style={{ opacity: screenShown ? 1 : 0 }}>
-                        {screenText}
+                        {spinnedPrize}
                     </div>
                 </div>
                 <div className="gameButtons" style={{ transform: game.stage === GameStage.SPINNING ? "translate(200%,0)" : "translate(0%,0)" }}>
@@ -119,7 +130,7 @@ export default function Desk({addPrizeToPlayer,spinnedPrize,screenShown,screenTe
                             <div>100.000</div>
                         </div>
                     </div>
-                    <div className="startSolve" onClick={() => { setIsSolving(!isSolving); }}>MEGFEJT</div>
+                    <div className="startSolve" onClick={() => { dispatch(setSolving(self.isSolving!)); }}>MEGFEJT</div>
                 </div>
             </div>
         </div>

@@ -1,7 +1,7 @@
 import { Player } from "@/app/types";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
-const initialState = [{id:0,name:"JÁTÉKOS1",points:0},{id:1,name:"Zsófi",points:0}] as Player[];
+const initialState = [{id:0,name:"JÁTÉKOS1",points:0,isSolving:false},{id:1,name:"Zsófi",points:0,isSolving:false}] as Player[];
 
 export const players = createSlice({
   name: "players",
@@ -19,7 +19,7 @@ export const players = createSlice({
     modifyPlayer: (state, action: PayloadAction<Player>) => {
       const modifiedPlayer = action.payload;
       return state.map(player => player.id === modifiedPlayer.id ? {...modifiedPlayer} : player)
-    }
+    },
   },
 });
 

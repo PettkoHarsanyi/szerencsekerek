@@ -7,19 +7,19 @@ import { useEffect, useState } from "react";
 import { setActualPlayer } from "@/redux/slices/actualPlayerSlice";
 import { riddles } from "../assets/riddles";
 import { modifyPlayer } from "@/redux/slices/playerSlice";
-import { modifySelf } from "@/redux/slices/selfSlice";
+import { modifySelf, setSolving } from "@/redux/slices/selfSlice";
 
-export default function Screen({ addPrizeToPlayer, spinnedPrize, isSolving, setIsSolving, }: any) {
+export default function Screen({ spinnedPrize}: any) {
     const game = useAppSelector(state => state.game)
     const players = useAppSelector(state => state.players);
     const actualPlayer = useAppSelector(state => state.actualPlayer);
+    const self = useAppSelector(state => state.self)
 
     const [gameRiddles, setGameRiddles] = useState<Riddle[]>(riddles);
 
     const dispatch = useAppDispatch();
 
     useEffect(() => {
-        dispatch(setActualPlayer(players[0]))
         const fadeOutDiv = document.getElementById("fadeOutDiv") as HTMLElement;
         if (fadeOutDiv) {
             fadeOutDiv.classList.add("fadedOut");
@@ -36,8 +36,6 @@ export default function Screen({ addPrizeToPlayer, spinnedPrize, isSolving, setI
         if (_riddle) {
             const riddle = _riddle.riddle;
             const riddleSplit = riddle.split(" ");
-
-            const riddleLengthWithoutSpace = riddleSplit.join('').length;
 
             const wordsByLines: string[][] = [[]];
             let currentLine = 0;
@@ -90,6 +88,15 @@ export default function Screen({ addPrizeToPlayer, spinnedPrize, isSolving, setI
         setGameRiddles(() => gameRiddles.filter((item, itemIndex) => itemIndex !== index));
         dispatch(setCurrentRiddle(riddle));
         return riddle;
+    }
+
+    const addPrizeToPlayer = (prize: any, multiplier: number = 1) => {
+        if (prize && !isNaN(prize)) {
+            let toModify: Player = { ...actualPlayer, points: actualPlayer.points! + (prize * multiplier) }
+            dispatch(setActualPlayer(toModify))
+            dispatch(modifyPlayer(toModify))
+            dispatch(modifySelf(toModify));
+        }
     }
 
     const focusNextInput = (event: any) => {
@@ -180,7 +187,7 @@ export default function Screen({ addPrizeToPlayer, spinnedPrize, isSolving, setI
             }, 3500);
 
             dispatch(setGameTable(_gameTable));
-            setIsSolving(false);
+            dispatch(setSolving(false))
         } else {
             // HA NEM TALÁLTA EL
             const borderDivs = document.querySelectorAll(".signal");
@@ -203,12 +210,12 @@ export default function Screen({ addPrizeToPlayer, spinnedPrize, isSolving, setI
                 dispatch(setStage(GameStage.SPINNING))
             }, 2000)
 
-            setIsSolving(false);
+            dispatch(setSolving(false));
         }
     }
 
     return (
-        <div className="gamePanel" id="gamePanel" style={{ transform: game.stage !== GameStage.SPINNING && game.stage !== GameStage.PLACEMENT ? "translate(-50%,0)" : "translate(-50%,-150%)" }}>
+        <div className="gamePanel" id="gamePanel" style={{ transform: game.stage === GameStage.GUESSING ? "translate(-50%,0)" : "translate(-50%,-150%)" }}>
             <div className="gameTitle">
                 <div className="screen">
                     {game.currentRiddle?.title.toUpperCase()}
@@ -221,7 +228,7 @@ export default function Screen({ addPrizeToPlayer, spinnedPrize, isSolving, setI
                             return row.map((cell, cellIndex) => {
                                 const firstAlready = false;
                                 return (<div className={`cell ${cell.isPlaying && cell.letter !== " " ? "cellPlaying" : ""}`} key={(rowIndex * 14) + cellIndex}>
-                                    {!cell.known && cell.isPlaying && isSolving && <input className="solveLetter" onClick={(e) => (e.target as HTMLInputElement).select()} onKeyDown={(e) => focusNextInput(e)} />}
+                                    {!cell.known && cell.isPlaying && self.isSolving && <input className="solveLetter" onClick={(e) => (e.target as HTMLInputElement).select()} onKeyDown={(e) => focusNextInput(e)} />}
                                     <div className={`purpleDiv ${cell.known ? "fadeInPurple" : ""}`}></div>
                                     <div className={`cellInner ${cell.known ? "slideClass" : ""}`}>{cell.known || cell.letter === "," ? cell.letter.toUpperCase() : ""}</div>
                                 </div>)
@@ -230,8 +237,8 @@ export default function Screen({ addPrizeToPlayer, spinnedPrize, isSolving, setI
                     }
                 </div>
             </div>
-            <div className="solveButtonsDiv" style={{ transform: isSolving ? "translate(-50%,100%)" : "translate(-50%,0)" }}>
-                <div className="solveButton" style={{ color: "red" }} onClick={() => { setIsSolving(false) }}><ImCross /></div>
+            <div className="solveButtonsDiv" style={{ transform: self.isSolving ? "translate(-50%,100%)" : "translate(-50%,0)" }}>
+                <div className="solveButton" style={{ color: "red" }} onClick={() => { dispatch(setSolving(false)) }}><ImCross /></div>
                 <div className="solveText">Írd be a teljes megfejtést, majd a pipával okézd le.<br />Ha rossz a megfejtés, lenullázódsz.</div>
                 <div className="solveButton" style={{ color: "green" }} onClick={() => { solveRiddle() }}><TiTick /></div>
             </div>
