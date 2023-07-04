@@ -130,7 +130,7 @@ export default function Desk({ spinnedPrize, screenShown }: any) {
                             <div>100.000</div>
                         </div>
                     </div>
-                    <div className="startSolve" onClick={() => { dispatch(setSolving(self.isSolving!)); }}>MEGFEJT</div>
+                    <div className="startSolve" onClick={() => { dispatch(setSolving(true)) }}>MEGFEJT</div>
                 </div>
             </div>
         </div>

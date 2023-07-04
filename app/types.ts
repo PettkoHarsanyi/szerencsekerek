@@ -1,8 +1,8 @@
 export type Player = {
     id?: number,
     name: string,
-    points?: number,
-    isSolving?: boolean,
+    points: number,
+    isSolving: boolean,
 }
 
 export type Message = {

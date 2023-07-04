@@ -18,9 +18,8 @@ import Screen from "../components/screen";
 
 export default function Game() {
     const players = useAppSelector(state => state.players);
-    const actualPlayer = useAppSelector(state => state.actualPlayer);
+    const self = useAppSelector(state=> state.self)
     const dispatch = useAppDispatch();
-    const [isSolving, setIsSolving] = useState(false);
     const [spinnedPrize, setSpinnedPrize] = useState<string | number>(0)
     const [screenShown, setScreenShown] = useState(false);
 
@@ -31,21 +30,11 @@ export default function Game() {
         }
     }, [])
 
-    useEffect(() => {
-        if (isSolving === true) {
-            const div = (document.querySelectorAll(".solveLetter")[0] as HTMLElement)
-            if (div) div.focus();
-        }
-    }, [isSolving])
-
-
-    
-
     return (
         <div className="gamePage">
             {/* KELL A JÁTÉK INDÍTÁSAKOR */}
             {/* <div id="fadeOutDiv" className="fadeOutDark"></div> */}
-            <div className="solveFade" id="solveFade" style={{ opacity: isSolving ? "0.9" : "0" }} />
+            <div className="solveFade" id="solveFade" style={{ opacity: self.isSolving ? "0.9" : "0" }} />
             <Desk    spinnedPrize={spinnedPrize} screenShown={screenShown} />
             <Screen  spinnedPrize={spinnedPrize} />
             <Wheel   setScreenShown={setScreenShown} setSpinnedPrize={setSpinnedPrize} />

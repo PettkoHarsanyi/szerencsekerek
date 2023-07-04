@@ -10,7 +10,7 @@ export const players = createSlice({
     reset: () => initialState,
     addPlayer: (state, action: PayloadAction<Player>) => {
       const { name } = action.payload;
-      state.push({ id: state.length, name, points: 0})
+      state.push({ id: state.length, name, points: 0, isSolving: false})
     },
     removePlayer: (state, action: PayloadAction<number>) => {
       const number = action.payload;
@@ -20,6 +20,9 @@ export const players = createSlice({
       const modifiedPlayer = action.payload;
       return state.map(player => player.id === modifiedPlayer.id ? {...modifiedPlayer} : player)
     },
+    resetRoundPoints : (state) => {
+      return state.map(player=> ({...player, points: 0}))
+    }
   },
 });
 
@@ -27,6 +30,7 @@ export const {
   addPlayer,
   removePlayer,
   modifyPlayer,
+  resetRoundPoints,
   reset
 } = players.actions;
 export default players.reducer;

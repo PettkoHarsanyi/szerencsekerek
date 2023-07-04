@@ -9,7 +9,7 @@ import { riddles } from "../assets/riddles";
 import { modifyPlayer } from "@/redux/slices/playerSlice";
 import { modifySelf, setSolving } from "@/redux/slices/selfSlice";
 
-export default function Screen({ spinnedPrize}: any) {
+export default function Screen({ spinnedPrize }: any) {
     const game = useAppSelector(state => state.game)
     const players = useAppSelector(state => state.players);
     const actualPlayer = useAppSelector(state => state.actualPlayer);
@@ -31,6 +31,13 @@ export default function Screen({ spinnedPrize}: any) {
         const randomRiddle = pickRandomRiddle();
         displayRidde(randomRiddle);
     }, [])
+
+    useEffect(() => {
+        if (self.isSolving === true) {
+            const div = (document.querySelectorAll(".solveLetter")[0] as HTMLElement)
+            if (div) div.focus();
+        }
+    }, [self.isSolving])
 
     const displayRidde = (_riddle: Riddle) => {
         if (_riddle) {
@@ -156,9 +163,11 @@ export default function Screen({ spinnedPrize}: any) {
             // HA ELTALÁLTA
             let _gameTable = game.gameTable;
 
-            _gameTable.forEach(row => row.map(cell => {
+            _gameTable = _gameTable.map(row => row.map(cell => {
                 if (cell.isPlaying) {
-                    cell.known = true;
+                    return { ...cell, known: true }
+                } else {
+                    return cell;
                 }
             }))
 

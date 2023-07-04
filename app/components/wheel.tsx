@@ -3,11 +3,12 @@
 import { useAppSelector } from "@/redux/hooks";
 import { setActualPlayer } from "@/redux/slices/actualPlayerSlice";
 import { setStage } from "@/redux/slices/gameSlice";
-import { modifyPlayer } from "@/redux/slices/playerSlice";
+import { modifyPlayer, resetRoundPoints } from "@/redux/slices/playerSlice";
 import { modifySelf } from "@/redux/slices/selfSlice";
 import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import wheel from "../../public/latvanyterv/kerek.png"
+import startwheel from "../../public/latvanyterv/kezdes.png"
 import pin from "../../public/pocok.png"
 import { GameStage, Player, Zone } from "../types";
 import Image from "next/image";
@@ -34,11 +35,15 @@ export default function Wheel({ setScreenShown, setSpinnedPrize }: any) {
         { deg: 240, value: 10000 }, { deg: 255, value: 250000 }, { deg: 270, value: "FELEZŐ" }, { deg: 285, value: 50000 }, { deg: 300, value: 75000 },
         { deg: 315, value: 100000 }, { deg: 330, value: 50000 }, { deg: 345, value: 150000 }, { deg: 360, value: 75000 }
     ])
+    const [placementZones] = useState<Zone[]>([
+        { deg: 0, value: 1 }, { deg: 36, value: 10 }, { deg: 72, value: 3 }, { deg: 108, value: 6 }, { deg: 144, value: 7 },
+        { deg: 180, value: 2 }, { deg: 216, value: 9 }, { deg: 252, value: 4 }, { deg: 288, value: 8 }, { deg: 324, value: 5 }, { deg: 360, value: 1 }
+    ])
 
     const dispatch = useDispatch();
 
     useEffect(() => {
-        if (game.stage === GameStage.SPINNING) {
+        if (game.stage === GameStage.SPINNING || game.stage === GameStage.PLACEMENT) {
             setCanSpin(true);
         }
     }, [game])
@@ -109,57 +114,107 @@ export default function Wheel({ setScreenShown, setSpinnedPrize }: any) {
         return zone?.value
     }
 
+    const convertDegToZone_placement = (degree: number) => {
+        const zoneIndex = placementZones.findIndex(zone => (degree % 360) < zone.deg) - 1
+        const zone = placementZones[Math.max(0, zoneIndex)];
+        return zone?.value
+    }
+
     const handleSpinWheel = (speedDeg: number) => {
         setIsSpinning(true);
         setCanSpin(false);
         setSpinRotation(speedDeg)
         setWheelRotation(speedDeg)
-        const _spinnedPrize = convertDegToZone(speedDeg)
-        // const _spinnedPrize : string = "DUPLÁZÓ";
-        setSpinnedPrize(_spinnedPrize);
 
-        if (_spinnedPrize === "CSŐD") {
-            let toModify: Player = { ...actualPlayer, points: 0 }
+        if (game.stage === GameStage.SPINNING) {
+
+            const _spinnedPrize = convertDegToZone(speedDeg)
+            // const _spinnedPrize : string = "DUPLÁZÓ";
+            setSpinnedPrize(_spinnedPrize);
+
+            if (_spinnedPrize === "CSŐD") {
+                let toModify: Player = { ...actualPlayer, points: 0 }
+                const currentPlayerIndex = players.findIndex((player) => player.id === actualPlayer.id);
+                setTimeout(() => {
+                    dispatch(setActualPlayer(players[(currentPlayerIndex + 1) % players.length]))
+                    dispatch(modifyPlayer(toModify))
+                    dispatch(modifySelf(toModify));
+                    dispatch(setStage(GameStage.SPINNING))
+                }, 5000)
+            } else if (_spinnedPrize === "FELEZŐ") {
+                let toModify = { ...actualPlayer, points: Math.ceil(actualPlayer.points! / 2) }
+                setTimeout(() => {
+                    dispatch(setActualPlayer(toModify))
+                    dispatch(modifyPlayer(toModify))
+                    dispatch(modifySelf(toModify));
+
+                }, 5000)
+            } else if (_spinnedPrize == "DUPLÁZÓ") {
+                let toModify = { ...actualPlayer, points: actualPlayer.points! * 2 }
+                setTimeout(() => {
+                    dispatch(setActualPlayer(toModify))
+                    dispatch(modifyPlayer(toModify))
+                    dispatch(modifySelf(toModify));
+                }, 5000)
+            }
+
+            setTimeout(() => {
+                if (_spinnedPrize !== "CSŐD") {
+                    dispatch(setStage(GameStage.GUESSING))
+                }
+            }, 3500)
+
+            setTimeout(() => {
+                setScreenShown(true);
+            }, 2000)
+
+            setTimeout(() => {
+                setScreenShown(false);
+            }, 5000)
+        }
+
+        if (game.stage === GameStage.PLACEMENT) {
+            const spinnedValue = convertDegToZone_placement(speedDeg)
             const currentPlayerIndex = players.findIndex((player) => player.id === actualPlayer.id);
-            setTimeout(()=>{
-                dispatch(setActualPlayer(players[(currentPlayerIndex + 1) % players.length]))
-                dispatch(modifyPlayer(toModify))
-                dispatch(modifySelf(toModify));
-                dispatch(setStage(GameStage.SPINNING))
-            },5000)
-        } else if (_spinnedPrize === "FELEZŐ") {
-            let toModify = { ...actualPlayer, points: Math.ceil(actualPlayer.points! / 2) }
-            setTimeout(()=>{
-                dispatch(setActualPlayer(toModify))
-                dispatch(modifyPlayer(toModify))
-                dispatch(modifySelf(toModify));
+            const currentPlayer = players[currentPlayerIndex]
+            setTimeout(() => {
+                dispatch(modifyPlayer({ ...currentPlayer, points: spinnedValue as number }))
+            }, 2000)
 
-            },5000)
-        } else if (_spinnedPrize == "DUPLÁZÓ") {
-            let toModify = { ...actualPlayer, points: actualPlayer.points! * 2 }
-            setTimeout(()=>{
-                dispatch(setActualPlayer(toModify))
-                dispatch(modifyPlayer(toModify))
-                dispatch(modifySelf(toModify));
-            },5000)
+            if (currentPlayerIndex < players.length - 1) {
+                setTimeout(() => {
+                    dispatch(setActualPlayer(players[(currentPlayerIndex + 1) % players.length]))
+                    dispatch(setStage(GameStage.PLACEMENT))
+                }, 3000)
+            }
         }
 
         setTimeout(() => {
             setIsSpinning(false);
             setSpinRotation(0);
-            setScreenShown(true);
         }, 2000)
-
-        setTimeout(() => {
-            if (_spinnedPrize !== "CSŐD") {
-                dispatch(setStage(GameStage.GUESSING))
-            }
-        }, 3500)
-
-        setTimeout(() => {
-            setScreenShown(false);
-        }, 5000)
     }
+
+    useEffect(() => {
+        if (game.stage === GameStage.PLACEMENT) {
+            if (players.every(player => player.points > 0)) {
+                let starts: Player;
+                let max = 0;
+                starts = players[0]
+                players.forEach(player => {
+                    if (player.points > max) {
+                        starts = player;
+                        max = player.points;
+                    }
+                })
+                setTimeout(() => {
+                    dispatch(resetRoundPoints())
+                    dispatch(setStage(GameStage.SPINNING))
+                    dispatch(setActualPlayer({...starts,points:0}));
+                }, 2000)
+            }
+        }
+    }, [players])
 
     return (
         <div className="wheelBg" style={{ transform: game.stage === GameStage.SPINNING || game.stage === GameStage.PLACEMENT ? "translate(-50%,0)" : "translate(-50%,-150%)", }}>
@@ -209,7 +264,7 @@ export default function Wheel({ setScreenShown, setSpinnedPrize }: any) {
                 <div className="pin">
                     <Image src={pin} alt="pöcök" />
                 </div>
-                <Image src={wheel} style={{ userSelect: "none", pointerEvents: "none", transition: isSpinning ? `${2}s cubic-bezier(0.000, 0.000, 0.315, 1.000)` : "none", transform: isSpinning ? `rotate(${spinRotation}deg)` : `rotate(${wheelRotation + currentRotation}deg)` }} alt="wheel" />
+                <Image src={game.stage === GameStage.PLACEMENT ? startwheel : wheel} style={{ userSelect: "none", pointerEvents: "none", transition: isSpinning ? `${2}s cubic-bezier(0.000, 0.000, 0.315, 1.000)` : "none", transform: isSpinning ? `rotate(${spinRotation}deg)` : `rotate(${wheelRotation + currentRotation}deg)` }} alt="wheel" />
             </div>
             <div className="wheelShadow"></div>
             <div className="spinButtons" style={{ pointerEvents: canSpin ? isSpinning ? "none" : "all" : "none", transform: canSpin ? "translate(100%,-50%)" : "translate(0,-50%)" }}>
