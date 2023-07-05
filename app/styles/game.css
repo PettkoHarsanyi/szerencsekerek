@@ -549,3 +549,17 @@
     z-index: 2;
     background-color: #191d4b;
 }
+
+.roundTable{
+    position: absolute;
+    left: 0;
+    top: 30%;
+    transition: 2s;
+    color: #00eef0;
+    border: 1vh solid #00eef0;
+    border-left: none;
+    background-color: #191d4b;
+    font-size: 10vh;
+    padding: 3vh;
+    border-radius: 0 5vh 5vh 0;
+}

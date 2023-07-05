@@ -3,7 +3,7 @@
 import { useAppSelector } from "@/redux/hooks";
 import { setActualPlayer } from "@/redux/slices/actualPlayerSlice";
 import { setStage } from "@/redux/slices/gameSlice";
-import { modifyPlayer, resetRoundPoints } from "@/redux/slices/playerSlice";
+import { modifyPlayer, resetPlacements, resetRoundPoints } from "@/redux/slices/playerSlice";
 import { modifySelf } from "@/redux/slices/selfSlice";
 import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
@@ -19,15 +19,15 @@ export default function Wheel({ setScreenShown, setSpinnedPrize }: any) {
     const game = useAppSelector(state => state.game)
     const self = useAppSelector(state => state.self)
 
-    const [isSpinning, setIsSpinning] = useState(false);
-    const [canSpin, setCanSpin] = useState(true);
-    const [spinRotation, setSpinRotation] = useState(0);
-    const [isWheelDragged, setWheelDragged] = useState(false);
-    const [startPoint, setStartPoint] = useState<{ x: number, y: number }>({ x: 0, y: 0 });
-    const [currentRotation, setCurrentRotation] = useState(0);
-    const [wheelRotation, setWheelRotation] = useState(0);
-    const [mouseMovePositions, setMouseMovePositions] = useState<any[]>([]);
-    const [spinZones] = useState<Zone[]>([
+    const [isSpinning, setIsSpinning] = useState(false);    // Éppen forog e a kerés (felesleges? canSpin kiváltja?)
+    const [canSpin, setCanSpin] = useState(true);   // Pörgethető e a kerék
+    const [spinRotation, setSpinRotation] = useState(0);    // Milyen forgást tegyen meg a kerék
+    const [isWheelDragged, setWheelDragged] = useState(false);  // Le van e nyomva az egér a kereken
+    const [startPoint, setStartPoint] = useState<{ x: number, y: number }>({ x: 0, y: 0 }); // Egér lenyomás kezdőhelye
+    const [currentRotation, setCurrentRotation] = useState(0);  // Amíg húzzuk a kereket (úgymond lódítjuk) addig ez követi
+    const [wheelRotation, setWheelRotation] = useState(0);  // Ha elengednénk pörgetés nélkül ez tárolja az aktuálist
+    const [mouseMovePositions, setMouseMovePositions] = useState<any[]>([]);    // Egér mozgások
+    const [spinZones] = useState<Zone[]>([  // Érték zónák
         { deg: 0, value: 75000 }, { deg: 15, value: 25000 }, { deg: 30, value: 50000 }, { deg: 45, value: 200000 },
         { deg: 60, value: 10000 }, { deg: 75, value: 100000 }, { deg: 90, value: 25000 }, { deg: 105, value: 50000 },
         { deg: 120, value: 150000 }, { deg: 135, value: 25000 }, { deg: 150, value: "CSŐD" }, { deg: 155, value: 1000000 }, { deg: 160, value: "CSŐD" },
@@ -35,7 +35,7 @@ export default function Wheel({ setScreenShown, setSpinnedPrize }: any) {
         { deg: 240, value: 10000 }, { deg: 255, value: 250000 }, { deg: 270, value: "FELEZŐ" }, { deg: 285, value: 50000 }, { deg: 300, value: 75000 },
         { deg: 315, value: 100000 }, { deg: 330, value: 50000 }, { deg: 345, value: 150000 }, { deg: 360, value: 75000 }
     ])
-    const [placementZones] = useState<Zone[]>([
+    const [placementZones] = useState<Zone[]>([ // Kezdésnél zónák
         { deg: 0, value: 1 }, { deg: 36, value: 10 }, { deg: 72, value: 3 }, { deg: 108, value: 6 }, { deg: 144, value: 7 },
         { deg: 180, value: 2 }, { deg: 216, value: 9 }, { deg: 252, value: 4 }, { deg: 288, value: 8 }, { deg: 324, value: 5 }, { deg: 360, value: 1 }
     ])
@@ -178,10 +178,10 @@ export default function Wheel({ setScreenShown, setSpinnedPrize }: any) {
             const currentPlayerIndex = players.findIndex((player) => player.id === actualPlayer.id);
             const currentPlayer = players[currentPlayerIndex]
             setTimeout(() => {
-                dispatch(modifyPlayer({ ...currentPlayer, points: spinnedValue as number }))
+                dispatch(modifyPlayer({ ...currentPlayer, points: spinnedValue as number, spinnedPlacement: true }))
             }, 2000)
 
-            if (currentPlayerIndex < players.length - 1) {
+            if (players.some(player=> !player.spinnedPlacement)) {
                 setTimeout(() => {
                     dispatch(setActualPlayer(players[(currentPlayerIndex + 1) % players.length]))
                     dispatch(setStage(GameStage.PLACEMENT))
@@ -197,12 +197,12 @@ export default function Wheel({ setScreenShown, setSpinnedPrize }: any) {
 
     useEffect(() => {
         if (game.stage === GameStage.PLACEMENT) {
-            if (players.every(player => player.points > 0)) {
+            if (players.every(player => player.spinnedPlacement)) {
                 let starts: Player;
                 let max = 0;
                 starts = players[0]
                 players.forEach(player => {
-                    if (player.points > max) {
+                    if (player.points >= max) {
                         starts = player;
                         max = player.points;
                     }
@@ -213,6 +213,7 @@ export default function Wheel({ setScreenShown, setSpinnedPrize }: any) {
                 setTimeout(() => {
                     dispatch(resetRoundPoints())
                     dispatch(setStage(GameStage.SPINNING))
+                    dispatch(resetPlacements())
                     dispatch(setActualPlayer({ ...starts, points: 0 }));
                 }, 3000)
             }

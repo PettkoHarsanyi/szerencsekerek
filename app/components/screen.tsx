@@ -2,7 +2,7 @@ import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { GameStage, Player, Riddle } from "../types";
 import { ImCross } from "react-icons/im";
 import { TiTick } from "react-icons/ti";
-import { setCurrentRiddle, setGameTable, setStage } from "@/redux/slices/gameSlice";
+import { addRound, setCurrentRiddle, setGameTable, setStage } from "@/redux/slices/gameSlice";
 import { useEffect, useState } from "react";
 import { setActualPlayer } from "@/redux/slices/actualPlayerSlice";
 import { riddles } from "../assets/riddles";
@@ -15,10 +15,11 @@ export default function Screen({ spinnedPrize }: any) {
     const actualPlayer = useAppSelector(state => state.actualPlayer);
     const self = useAppSelector(state => state.self)
 
-    const [gameRiddles, setGameRiddles] = useState<Riddle[]>(riddles);
+    const [gameRiddles, setGameRiddles] = useState<Riddle[]>(riddles); // A játékban szereplő feladványok
 
     const dispatch = useAppDispatch();
 
+    // A játékképernyő betöltődésekor kell egy fade és egy véletlen feladvány
     useEffect(() => {
         const fadeOutDiv = document.getElementById("fadeOutDiv") as HTMLElement;
         if (fadeOutDiv) {
@@ -32,6 +33,7 @@ export default function Screen({ spinnedPrize }: any) {
         displayRidde(randomRiddle);
     }, [])
 
+    // A Desk változtatja a self.isSolvingot, itt reagál és berakja focust első inputba
     useEffect(() => {
         if (self.isSolving === true) {
             const div = (document.querySelectorAll(".solveLetter")[0] as HTMLElement)
@@ -39,6 +41,7 @@ export default function Screen({ spinnedPrize }: any) {
         }
     }, [self.isSolving])
 
+    // A feladvány megjelenítése
     const displayRidde = (_riddle: Riddle) => {
         if (_riddle) {
             const riddle = _riddle.riddle;
@@ -88,7 +91,7 @@ export default function Screen({ spinnedPrize }: any) {
         }
     }
 
-
+    // Véletlenszerű feladvány választása és az törlése a tömbből.
     const pickRandomRiddle = () => {
         const index = Math.floor(Math.random() * (gameRiddles.length));
         const riddle = gameRiddles[index];
@@ -97,6 +100,7 @@ export default function Screen({ spinnedPrize }: any) {
         return riddle;
     }
 
+    // Kipörgetett érték hozzáadása a játékoshoz
     const addPrizeToPlayer = (prize: any, multiplier: number = 1) => {
         if (prize && !isNaN(prize)) {
             let toModify: Player = { ...actualPlayer, points: actualPlayer.points! + (prize * multiplier) }
@@ -106,6 +110,7 @@ export default function Screen({ spinnedPrize }: any) {
         }
     }
 
+    // Megfejtéskor a következő input fókusza
     const focusNextInput = (event: any) => {
         event.preventDefault();
         const inputs = Array.prototype.slice.call(document.querySelectorAll('.solveLetter'));
@@ -137,6 +142,7 @@ export default function Screen({ spinnedPrize }: any) {
         }
     }
 
+    // A feladvány megfejtése
     const solveRiddle = () => {
         const inputs: HTMLInputElement[] = Array.prototype.slice.call(document.querySelectorAll('.solveLetter'));
         const alreadyGuessed: string[] = []
@@ -188,10 +194,12 @@ export default function Screen({ spinnedPrize }: any) {
 
 
             setTimeout(() => {
-                dispatch(resetRoundPoints())
+                if(game.round<3){
+                    dispatch(saveRoundPoints());
+                    dispatch(resetRoundPoints())
+                }
                 dispatch(setStage(GameStage.PLACEMENT));
-                dispatch(setActualPlayer(players[0]));
-                dispatch(saveRoundPoints());
+                dispatch(addRound());
             }, 2000)
             setTimeout(() => {
                 const randomRiddle = pickRandomRiddle()

@@ -1,7 +1,7 @@
 import { BoardCell, Game, GameStage, Player, Riddle } from "@/app/types";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
-const initialState = {local: true, stage: GameStage.PLACEMENT,gameTable: [],currentRiddle: {riddle:"",title:""},round: 0} as Game;
+const initialState = {local: true, stage: GameStage.PLACEMENT,gameTable: [],currentRiddle: {riddle:"",title:""},round: 1} as Game;
 
 export const game = createSlice({
   name: "game",
@@ -19,7 +19,10 @@ export const game = createSlice({
     },
     setCurrentRiddle : (state, action: PayloadAction<Riddle>) => {
       return {...state, currentRiddle: action.payload}
-    }
+    },
+    addRound : (state) => {
+      return {...state,round: state.round+1}
+    },
   },
 });
 
@@ -28,6 +31,7 @@ export const {
   setLocal,
   setStage,
   setGameTable,
-  setCurrentRiddle
+  setCurrentRiddle,
+  addRound
 } = game.actions;
 export default game.reducer;

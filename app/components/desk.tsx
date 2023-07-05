@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { GameStage, Player } from "../types";
 import { setGameTable, setStage } from "@/redux/slices/gameSlice";
 import { setActualPlayer } from "@/redux/slices/actualPlayerSlice";
-import { modifyPlayer } from "@/redux/slices/playerSlice";
+import { modifyPlayer, switchPlayersTotal } from "@/redux/slices/playerSlice";
 import { modifySelf, setSolving } from "@/redux/slices/selfSlice";
 import { HiOutlineShoppingCart } from "react-icons/hi";
 
@@ -17,11 +17,17 @@ export default function Desk({ spinnedPrize, screenShown }: any) {
     const self = useAppSelector(state => state.self)
     const game = useAppSelector(state => state.game)
 
-    const [canGuess, setCanGuess] = useState(false);
-    const [vovelsShown, setVovelsShown] = useState(false);
-    const [roundConsonants, setRoundConsonants] = useState(CONSONANTS);
-    const [roundVowels, setRoundVowels] = useState(VOWELS);
+    const [canGuess, setCanGuess] = useState(false);    // Tippelést engedi / tiltja
+    const [vovelsShown, setVovelsShown] = useState(false);  // A magánhangzók mutatva vannak-e
+    const [roundConsonants, setRoundConsonants] = useState(CONSONANTS); // Az aktuális kör mássalhangzói
+    const [roundVowels, setRoundVowels] = useState(VOWELS); // Az aktuális kör magánhangzói
     const dispatch = useAppDispatch();
+
+    useEffect(()=>{
+        if(game.round>2){
+            dispatch(switchPlayersTotal())
+        }
+    },[game.round])
 
     useEffect(() => {
         if (game.stage === GameStage.GUESSING) {
@@ -34,6 +40,7 @@ export default function Desk({ spinnedPrize, screenShown }: any) {
         setRoundVowels(VOWELS);
     }, [game.round])
 
+    // A kipörgetett érték hozzáadása a játékoshoz
     const addPrizeToPlayer = (prize: any, multiplier: number = 1) => {
         if (prize && !isNaN(prize)) {
             let toModify: Player = { ...actualPlayer, points: actualPlayer.points! + (prize * multiplier) }
@@ -44,12 +51,12 @@ export default function Desk({ spinnedPrize, screenShown }: any) {
     }
 
 
-
+    // Egy betű megtippelése
     const guessLetter = (letter: string) => {
         setCanGuess(false);
         if (game.local || self.id === actualPlayer.id) {
             if (game.currentRiddle?.riddle.includes(letter)) {
-                // HA VAN BENNE OLYAN BETŰ
+                // Ha van benne olyan betű, amilyet tippeltek
                 dispatch(setGameTable(game.gameTable.map((row: any) => row.map((cell: any) => {
                     if (cell.letter === letter) {
                         return { ...cell, known: true }
@@ -68,6 +75,7 @@ export default function Desk({ spinnedPrize, screenShown }: any) {
 
                 addPrizeToPlayer(spinnedPrize, timeOfOccurance);
             } else {
+                // Ha nincs
                 const currentPlayerIndex = players.findIndex((player) => player.id === actualPlayer.id);
                 dispatch(setActualPlayer(players[(currentPlayerIndex + 1) % players.length]))
                 const borderDivs = document.querySelectorAll(".signal");
@@ -86,6 +94,7 @@ export default function Desk({ spinnedPrize, screenShown }: any) {
         }
     }
 
+    // Egy magánhangzó vétele
     const handleBuyVowel = () => {
         if (((!game.local && actualPlayer.points! >= 100000) || (actualPlayer.points! >= VOVELPRICE)) && !vovelsShown) {
             setVovelsShown(true)
