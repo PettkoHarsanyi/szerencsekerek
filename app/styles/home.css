@@ -45,6 +45,8 @@ main {
   transform: translate(-50%, -50%);
 }
 
+
+
 .mainDiv {
   top: 50%;
   left: 50%;
@@ -52,11 +54,43 @@ main {
   position: absolute;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  justify-content: space-evenly;
   align-items: center;
-  gap: 300px;
-  height: 60%;
+  height: 100%;
 }
+
+.mainButton{
+  font-size: 10vh;   
+  text-shadow: 0 0 2vh 2vh #ff0000;
+  font-family: Beon;
+  border: 0.5vh solid orange;
+  color: rgb(255, 191, 0);
+  padding: 1vh 4vh;
+  border-radius: 10vh;
+  
+  pointer-events: all !important;
+  cursor: pointer;
+  display: inline-block;
+  transition: 0.5s ease;
+  box-shadow: 0 0 2vh 0.5vh rgba(255, 191, 0, 0.296), inset 0 0 2vh 0.5vh rgba(255, 191, 0, 0.296);
+  position: relative;
+  display: flex;
+  width: fit-content;
+}
+
+.soonDiv{
+  position: absolute;
+  font-size: 5vh;
+  top: 50%;
+  right: -100%;
+  transform: translate(0,-50%);
+  color: green;
+}
+
+.mainButton:hover {
+  transform: scale(1.1);
+}
+
 
 .mainPage {
   top: 0;
@@ -152,6 +186,14 @@ main {
   justify-content: center;
   align-items: center;
   gap: 1vh;
+}
+
+.addPlayer{
+  height: 8vh;
+  aspect-ratio: 1/1;
+  border-radius: 10vh;
+  font-size: 4vh;
+  cursor: pointer;
 }
 
 .modify {

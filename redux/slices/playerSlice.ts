@@ -1,15 +1,15 @@
 import { Player } from "@/app/types";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
-const initialState = [{id:0,name:"JÁTÉKOS1",points:0,isSolving:false,totalPoints:0},{id:1,name:"Zsófi",points:0,isSolving:false,totalPoints:0}] as Player[];
-
+const initialState = [{id:0,name:"JÁTÉKOS1",points:0,isSolving:false,totalPoints:0}] as Player[];
+// {id:1,name:"Zsófi",points:0,isSolving:false,totalPoints:0}
 export const players = createSlice({
   name: "players",
   initialState,
   reducers: {
     reset: () => initialState,
-    addPlayer: (state, action: PayloadAction<Player>) => {
-      const { name } = action.payload;
+    addPlayer: (state, action: PayloadAction<string>) => {
+      const name = action.payload;
       state.push({ id: state.length, name, points: 0, isSolving: false, totalPoints: 0})
     },
     removePlayer: (state, action: PayloadAction<number>) => {

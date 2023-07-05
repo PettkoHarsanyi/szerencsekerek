@@ -87,8 +87,8 @@ export default function Desk({ spinnedPrize, screenShown }: any) {
     }
 
     const handleBuyVowel = () => {
-        if ((!game.local && actualPlayer.points! >= 100000) || (actualPlayer.id === self.id && actualPlayer.points! >= VOVELPRICE) && !vovelsShown) {
-            setVovelsShown(!vovelsShown)
+        if (((!game.local && actualPlayer.points! >= 100000) || (actualPlayer.points! >= VOVELPRICE)) && !vovelsShown) {
+            setVovelsShown(true)
             handleModifyPlayer(actualPlayer.id!, { points: actualPlayer.points! - VOVELPRICE })
         }
     }
@@ -125,7 +125,7 @@ export default function Desk({ spinnedPrize, screenShown }: any) {
                 <div className="gameButtons" style={{ transform: game.stage === GameStage.GUESSING ? "translate(0%,0)":"translate(200%,0)" }}>
                     <div className="buyMenu">
                         <HiOutlineShoppingCart style={{ color: "#00eef0", fontSize: "4vh" }} />
-                        <div id="buyVowelDiv" className="buyVowel" onClick={handleBuyVowel} onMouseOver={(event) => { event.currentTarget.style.backgroundColor = (!game.local && actualPlayer.points! >= VOVELPRICE) || (actualPlayer.id === self.id && actualPlayer.points! >= VOVELPRICE) ? "green" : "#ff000068" }} onMouseLeave={(event) => { event.currentTarget.style.backgroundColor = "" }}>
+                        <div id="buyVowelDiv" className="buyVowel" onClick={handleBuyVowel} onMouseOver={(event) => { event.currentTarget.style.backgroundColor = (!game.local && actualPlayer.points! >= VOVELPRICE) || (actualPlayer.points! >= VOVELPRICE) ? "green" : "#ff000068" }} onMouseLeave={(event) => { event.currentTarget.style.backgroundColor = "" }}>
                             <div>AÁ</div>
                             <div>100.000</div>
                         </div>

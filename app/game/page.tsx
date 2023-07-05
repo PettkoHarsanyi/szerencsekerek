@@ -5,13 +5,6 @@ import "../styles/game.css"
 import { useEffect, useState } from "react";
 import { redirect } from 'next/navigation';
 import { setActualPlayer } from "@/redux/slices/actualPlayerSlice";
-import { BoardCell, GameStage, Player, Riddle } from "../types";
-import { HiOutlineShoppingCart } from "react-icons/hi"
-import { TiTick } from "react-icons/ti";
-import { ImCross } from "react-icons/im";
-import { modifyPlayer } from "@/redux/slices/playerSlice";
-import { modifySelf, setSelf } from "@/redux/slices/selfSlice";
-import { setCurrentRiddle, setGameTable, setStage } from "@/redux/slices/gameSlice";
 import Wheel from "../components/wheel";
 import Desk from "../components/desk";
 import Screen from "../components/screen";
@@ -33,7 +26,7 @@ export default function Game() {
     return (
         <div className="gamePage">
             {/* KELL A JÁTÉK INDÍTÁSAKOR */}
-            {/* <div id="fadeOutDiv" className="fadeOutDark"></div> */}
+            <div id="fadeOutDiv" className="fadeOutDark"></div>
             <div className="solveFade" id="solveFade" style={{ opacity: self.isSolving ? "0.9" : "0" }} />
             <Desk    spinnedPrize={spinnedPrize} screenShown={screenShown} />
             <Screen  spinnedPrize={spinnedPrize} />

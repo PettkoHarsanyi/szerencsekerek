@@ -25,7 +25,7 @@ export default function Home() {
   const self = useAppSelector(state => state.self);
   const messages = useAppSelector(state => state.messages);
   const [init, setInit] = useState(false);
-  const [isEditing, setEditing] = useState(false);
+  const [isEditing, setEditing] = useState(-1);
   const [text, setText] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
   const chatRef = useRef(null);
@@ -70,30 +70,31 @@ export default function Home() {
     // dispatch(addPlayer({ name: "Zsofi" }))
   }, [])
 
-  const handleInputChange = (event: any) => {
-    const modifiedData = { id: self.id, name: event.target.value } as Player
-    dispatch(setSelf({...self,...modifiedData}));
-    dispatch(modifyPlayer({...self,...modifiedData}))
-    updateInputWidth();
+  const handleInputChange = (event: any, index: number) => {
+    const modifiedData = { id: players[index].id, name: event.target.value } as Player
+    dispatch(modifyPlayer({ ...players[index], ...modifiedData }))
+    updateInputWidth(index);
   };
 
-  const handleKeyDown = (event: any) => {
+  const handleKeyDown = (event: any, index: number) => {
     if (event.keyCode === 13) {
-      saveName();
+      saveName(index);
     }
   }
 
-  const saveName = () => {
-    if (inputRef.current !== null) {
-      inputRef.current.blur();
-      setEditing(false);
+  const saveName = (index: number) => {
+    const elem = document.getElementById(`player${index}`)
+    if (elem) {
+      elem.blur();
+      setEditing(-1);
     }
   }
 
-  const updateInputWidth = () => {
-    if (inputRef.current !== null) {
-      inputRef.current.style.width = "0";
-      inputRef.current.style.width = inputRef.current.scrollWidth + 'px';
+  const updateInputWidth = (index: number) => {
+    const elem = document.getElementById(`player${index}`)
+    if (elem) {
+      elem.style.width = "0";
+      elem.style.width = elem.scrollWidth + 'px';
     }
   };
 
@@ -129,7 +130,11 @@ export default function Home() {
         <Image src={background} className='initPos background parallax' data-speedx="0.02" data-speedy="0.04" data-rotation="0" alt='background' priority unoptimized />
         <div className='parallax mainDiv initPos' data-speedx="0.07" data-speedy="0.07" data-rotation="0.7">
           <Image src={logo} className='logo' alt='szerencsekerék logo' />
-          <Image src={start} className='start' data-speedx="0.07" data-speedy="0.07" data-rotation="0.7" alt='szerencsekerék start' onClick={openRoom} />
+          <div className='mainButton' onClick={openRoom}>HELYI</div>
+          <div className='mainButton' style={{ cursor: "not-allowed", opacity: 0.5 }}>
+            <div style={{ position: "relative" }}>ONLINE</div>
+            <div className='soonDiv'>// HAMAROSAN</div>
+          </div>
         </div>
       </div>
       <div className='roomPage'>
@@ -139,31 +144,30 @@ export default function Home() {
             <div className='innerDiv'>
               <div className='title'>CSATLAKOZOTT JÁTÉKOSOK</div>
               <div className='joinedPlayers'>
-                {players.map((player) => (
+                {players.map((player, index) => (
                   <div key={player.id} className='player'>
-                    {player.id === self.id ?
-                      <>
-                        <input type='text' ref={inputRef} className='selfInput' onBlur={() => { setEditing(false); }} value={self.name || ""} size={4} readOnly={isEditing ? false : true}
-                          onChange={handleInputChange}
-                          onKeyDown={handleKeyDown}
-                        />(ÉN)<div className='modify' onClick={() => {
-                          if (!isEditing) {
-                            setEditing(true);
-                            if (inputRef.current !== null) {
-                              inputRef.current.focus();
-                              inputRef.current.select();
-                            }
-                          } else {
-                            saveName();
-                          }
-                        }}
-                        >{isEditing ? <TiTick /> : <BiEdit />}</div>
-                      </>
-                      :
-                      player.name
-                    }
+                    <>
+                      <input type='text' id={`player${index}`} className='selfInput' onBlur={() => { setEditing(-1); }} defaultValue={player.name} size={5} readOnly={isEditing === index ? false : true}
+                        onChange={(event) => handleInputChange(event, index)}
+                        onKeyDown={(event) => handleKeyDown(event, index)}
+                      />
+                      {/* {self.id === player.id && "(ÉN)"} */}
+                      <div className='modify' onClick={() => {
+                        setEditing(index);
+                        const thisElement = document.getElementById(`player${index}`) as HTMLInputElement;
+                        thisElement.focus();
+                        thisElement.select();
+                        // inputRef.current.focus();
+                        // inputRef.current.select();
+                        if (isEditing === index) {
+                          saveName(index);
+                        }
+                      }}
+                      >{isEditing === index ? <TiTick /> : <BiEdit />}</div>
+                    </>
                   </div>
                 ))}
+                <div className='addPlayer player' onClick={() => dispatch(addPlayer(`JÁTÉKOS${players.length + 1}`))}>+</div>
               </div>
               <div className='roomCode'>SZOBAKÓD: <input className='code' onClick={(e: any) => { e.target.select(); navigator.clipboard.writeText(e.target.value); const copied: any = document.getElementById("copied"); copied.animate([{ opacity: 0 }, { opacity: 1 }, { opacity: 0 }], 1000) }} readOnly value={"41KJJHE2134IBU"}></input><div id='copied' className='copied' style={{ display: "flex", color: "green" }}><AiOutlineCopy /><TiTick /></div></div>
               <div className='buttons'>

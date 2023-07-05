@@ -7,8 +7,8 @@ import { modifyPlayer, resetRoundPoints } from "@/redux/slices/playerSlice";
 import { modifySelf } from "@/redux/slices/selfSlice";
 import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
-import wheel from "../../public/latvanyterv/kerek.png"
-import startwheel from "../../public/latvanyterv/kezdes.png"
+import wheel from "../../public/kerek.png"
+import startwheel from "../../public/kezdes.png"
 import pin from "../../public/pocok.png"
 import { GameStage, Player, Zone } from "../types";
 import Image from "next/image";
