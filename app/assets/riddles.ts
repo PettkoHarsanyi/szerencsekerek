@@ -144,5 +144,61 @@ export const riddles : Riddle[] = [
     {
         title: "nem vitatkozik",
         riddle: "hallgatás beleegyezés"
+    },
+    {
+        title: "nem adom örökbe",
+        riddle: "kölcsön kenyér visszajár"
+    },
+    {
+        title: "könnyű szívvel",
+        riddle: "nagy kő esett le a szívéről"
+    },
+    {
+        title: "jobb híján",
+        riddle: "ha minden kötél szakad"
+    },
+    {
+        title: "rossz hétfő reggelek",
+        riddle: "bal lábbal kelt fel"
+    },
+    {
+        title: "mint két tojás",
+        riddle: "egyik kutya másik eb"
+    },
+    {
+        title: "nem játszik szabályosan",
+        riddle: "a látszat csal"
+    },
+    {
+        title: "páros legyek",
+        riddle: "két legyet üt egy csapásra"
+    },
+    {
+        title: "a ló túloldalán",
+        riddle: "ami sok az sok",
+    },
+    {
+        title: "hoztál papírzsepit?",
+        riddle: "könnyes búcsú",
+    },
+    {
+        title: "túl gyorsan mentél",
+        riddle: "negyvenes tábla",
+    },
+    {
+        title: "szőlő birodalma",
+        riddle: "egri borvidék",
+    },
+    {
+        title: "köszöntöm hölgyem",
+        riddle: "kezét csókolom",
+    },
+    {
+        title: "kézben tartom a sorsom",
+        riddle: "szerencsehozó karkötő",
+    },
+    {
+        title: "városi dzsungel",
+        riddle: "betontenger"
     }
 ]

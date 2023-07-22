@@ -24,7 +24,7 @@ export default function Desk({ spinnedPrize, screenShown }: any) {
     const dispatch = useAppDispatch();
 
     useEffect(()=>{
-        if(game.round>2){
+        if(game.round===3){
             dispatch(switchPlayersTotal())
         }
     },[game.round])
@@ -125,7 +125,7 @@ export default function Desk({ spinnedPrize, screenShown }: any) {
             <div className="gameDesk">
                 <div className="gamePlayers">
                     {players.map(player => (
-                        <div className={`gamePlayer ${actualPlayer.id === player.id ? "bg-[#ff00fc]" : "bg-[#191d4b]"}`} key={player.id}><div>{player.name.toUpperCase()}<br /><span>{player.points}</span></div></div>
+                        <div className={`gamePlayer ${actualPlayer.id === player.id ? "bg-[#ff00fc]" : "bg-[#191d4b]"}`} key={player.id}><div>{player.name.toUpperCase()}<br /><span>{game.stage === GameStage.PLACEMENT ? player.placementPoints : player.points}</span></div></div>
                     ))}
                     <div className="prizeScreen" style={{ opacity: screenShown ? 1 : 0 }}>
                         {spinnedPrize}

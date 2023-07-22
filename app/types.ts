@@ -5,6 +5,7 @@ export type Player = {
     isSolving: boolean,
     totalPoints: number,
     spinnedPlacement: boolean,
+    placementPoints: number,
 }
 
 export type Message = {

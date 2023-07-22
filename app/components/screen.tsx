@@ -197,6 +197,7 @@ export default function Screen({ spinnedPrize }: any) {
                 if(game.round<3){
                     dispatch(saveRoundPoints());
                     dispatch(resetRoundPoints())
+                    console.log("NAGEC, MOST IS LEFUTOTTAM HEJJ");
                 }
                 dispatch(setStage(GameStage.PLACEMENT));
                 dispatch(addRound());

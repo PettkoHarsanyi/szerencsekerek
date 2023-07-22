@@ -1,0 +1,51 @@
+.swapDiv{
+    position: absolute;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.83);
+    z-index: 300;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 5vh;
+    font-size: 5vh;
+}
+
+.swapQuestion{
+    background-color: aqua;
+    padding: 0.5vh 20vh;
+    border-radius: 5vh;
+    color: #1f1a5d;
+}
+
+.swapPlayers{
+    display: flex;
+    gap: 2vh;
+    border-radius: 4vh;
+    border: 2vh solid #00eef0;
+    overflow: hidden;
+    background-color: #00eef0;
+    font-weight: bold;
+    transition: 2s all;
+}
+
+.swapPlayer{
+    min-width: 30vw;
+    background-color: #1f1a5d;
+    padding: 3vh 10vh;
+    color: #00eef0;
+    text-align: center;
+    line-height: 1.2;
+    transition: 0.5s all;
+    cursor: pointer;
+}
+
+.swapPlayer:hover{
+    background-color: #ff00fc;
+}
+
+
+.swapPlayer span {
+    color: white;
+}
