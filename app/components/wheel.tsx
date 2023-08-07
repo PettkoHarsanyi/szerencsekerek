@@ -13,6 +13,8 @@ import startwheel from "../../public/kezdes.png"
 import pin from "../../public/pocok.png"
 import { GameStage, Player, Zone } from "../types";
 import Image from "next/image";
+import endwheel from "../../public/endgame_circle.png";
+import { setEndGameValue } from "@/redux/slices/endGameSlice";
 
 export default function Wheel({ setScreenShown, setSpinnedPrize, setIsSwapping, canSpin, setCanSpin }: any) {
     const players = useAppSelector(state => state.players);
@@ -46,6 +48,14 @@ export default function Wheel({ setScreenShown, setSpinnedPrize, setIsSwapping, 
         { deg: 165, value: 75000 }, { deg: 180, value: 10000 }, { deg: 195, value: 100000 }, { deg: 210, value: "DUPLÁZÓ" }, { deg: 225, value: 50000 },
         { deg: 240, value: 10000 }, { deg: 255, value: 250000 }, { deg: 270, value: "FELEZŐ" }, { deg: 285, value: 50000 }, { deg: 300, value: 75000 },
         { deg: 315, value: 100000 }, { deg: 330, value: 50000 }, { deg: 345, value: 150000 }, { deg: 360, value: 75000 }
+    ])
+
+
+    const [endGameZonesFix] = useState<Zone[]>([
+        { deg: 0, value: 1000000 }, { deg: 36, value: 500000 }, { deg: 72, value: 2000000 },
+        { deg: 108, value: 5000000 }, { deg: 144, value: 2000000 }, { deg: 180, value: 500000 },
+        { deg: 216, value: 500000 }, { deg: 252, value: 1000000 }, { deg: 288, value: 50000 },
+        { deg: 324, value: 1000000 }, { deg: 360, value: 1000000 },
     ])
 
     const dispatch = useDispatch();
@@ -122,7 +132,11 @@ export default function Wheel({ setScreenShown, setSpinnedPrize, setIsSwapping, 
             zoneIndex = placementZones.findIndex(zone => (degree % 360) < zone.deg) - 1
             zone = placementZones[Math.max(0, zoneIndex)];
         } else {
-            if (game.round < 2) {
+            if (game.stage === GameStage.ENDGAME_SPINNING) {
+                zoneIndex = endGameZonesFix.findIndex(zone => (degree % 360) < zone.deg) - 1
+                zone = endGameZonesFix[Math.max(0, zoneIndex)];
+            }
+            if (game.round < 3) {
                 zoneIndex = spinZones.findIndex(zone => (degree % 360) < zone.deg) - 1
                 zone = spinZones[Math.max(0, zoneIndex)];
             } else {
@@ -130,7 +144,7 @@ export default function Wheel({ setScreenShown, setSpinnedPrize, setIsSwapping, 
                 zone = changerSpinZones[Math.max(0, zoneIndex)];
             }
         }
-        return zone?.value
+        return zone.value
     }
 
     const handleSpinWheel = (speedDeg: number) => {
@@ -170,9 +184,9 @@ export default function Wheel({ setScreenShown, setSpinnedPrize, setIsSwapping, 
                     dispatch(modifySelf(toModify));
                 }, 5000)
             } else if (_spinnedPrize == "CSERE") {
-                setTimeout(()=>{
+                setTimeout(() => {
                     setIsSwapping(true);
-                },2000)
+                }, 2000)
             }
 
             if (_spinnedPrize !== "CSERE") {
@@ -208,6 +222,14 @@ export default function Wheel({ setScreenShown, setSpinnedPrize, setIsSwapping, 
             }
         }
 
+        if (game.stage === GameStage.ENDGAME_SPINNING) {
+            const spinnedValue = convertDegToZone(speedDeg) as number
+            dispatch(setEndGameValue(spinnedValue));
+            setTimeout(() => {
+                dispatch(setStage(GameStage.ENDGAME_PICKING));
+            }, 4000)
+        }
+
         setTimeout(() => {
             setIsSpinning(false);
             setSpinRotation(0);
@@ -240,7 +262,7 @@ export default function Wheel({ setScreenShown, setSpinnedPrize, setIsSwapping, 
     }, [players])
 
     return (
-        <div className="wheelBg" id="wheelBg" style={{ transform: game.stage === GameStage.SPINNING || game.stage === GameStage.PLACEMENT ? "translate(-50%,0)" : "translate(-50%,-150%)", }}>
+        <div className="wheelBg" id="wheelBg" style={{ transform: game.stage === GameStage.SPINNING || game.stage === GameStage.PLACEMENT || game.stage === GameStage.ENDGAME_SPINNING ? "translate(-50%,0)" : "translate(-50%,-150%)", }}>
             <div className="wheel"
                 onMouseDown={(event) => {
                     if (canSpin) {
@@ -287,7 +309,7 @@ export default function Wheel({ setScreenShown, setSpinnedPrize, setIsSwapping, 
                 <div className="pin">
                     <Image src={pin} alt="pöcök" />
                 </div>
-                <Image src={game.stage === GameStage.PLACEMENT || game.stage === GameStage.PAUSE ? startwheel : game.round > 2 ? changeWheel : wheel} style={{ userSelect: "none", pointerEvents: "none", transition: isSpinning ? `${2}s cubic-bezier(0.000, 0.000, 0.315, 1.000)` : "none", transform: isSpinning ? `rotate(${spinRotation}deg)` : `rotate(${wheelRotation + currentRotation}deg)` }} alt="wheel" />
+                <Image src={game.stage == GameStage.ENDGAME_SPINNING || game.stage === GameStage.ENDGAME_PICKING || game.stage === GameStage.ENDGAME_SOLVING ? endwheel : game.stage === GameStage.PLACEMENT || game.stage === GameStage.PAUSE ? startwheel : game.round > 2 ? changeWheel : wheel} style={{ userSelect: "none", pointerEvents: "none", transition: isSpinning ? `${2}s cubic-bezier(0.000, 0.000, 0.315, 1.000)` : "none", transform: isSpinning ? `rotate(${spinRotation}deg)` : `rotate(${wheelRotation + currentRotation}deg)` }} alt="wheel" />
             </div>
             <div className="wheelShadow"></div>
             <div className="spinButtons" style={{ pointerEvents: canSpin ? isSpinning ? "none" : "all" : "none", transform: canSpin ? "translate(100%,-50%)" : "translate(0,-50%)" }}>

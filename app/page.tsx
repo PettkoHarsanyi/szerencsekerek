@@ -20,6 +20,8 @@ import { redirect } from 'next/navigation';
 export default function Home() {
   const router = useRouter()
 
+
+
   const dispatch = useAppDispatch();
   const players = useAppSelector(state => state.players);
   const self = useAppSelector(state => state.self);
@@ -150,6 +152,17 @@ export default function Home() {
                       <input type='text' id={`player${index}`} className='selfInput' onBlur={() => { setEditing(-1); }} defaultValue={player.name} size={5} readOnly={isEditing === index ? false : true}
                         onChange={(event) => handleInputChange(event, index)}
                         onKeyDown={(event) => handleKeyDown(event, index)}
+                        onClick={() => {
+                          setEditing(index);
+                          const thisElement = document.getElementById(`player${index}`) as HTMLInputElement;
+                          thisElement.focus();
+                          thisElement.select();
+                          // inputRef.current.focus();
+                          // inputRef.current.select();
+                          if (isEditing === index) {
+                            saveName(index);
+                          }
+                        }}
                       />
                       {/* {self.id === player.id && "(ÉN)"} */}
                       <div className='modify' onClick={() => {

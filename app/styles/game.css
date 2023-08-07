@@ -10,7 +10,7 @@
 
 .gameDesk {
     bottom: 0;
-    height: 150px;
+    height: 200px;
     width: 100vw;
     background-color: rgb(195, 195, 195);
     display: flex;
@@ -93,6 +93,34 @@
     transform: translate(-50%, 0);
 }
 
+.endGameLetters{
+    position: absolute;
+    background-color: #191d4b;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    top: 0;
+    left: 50%;
+    gap: 2vh;
+    border-radius: 2vh 2vh 0 0;
+    padding: 2vh 10vh;
+    transition: 1s ease-in-out;
+    z-index: 5;
+}
+
+.endLetter {
+    width: 100px;
+    height: 100px;
+    border: 0.5vh solid #00eef0;
+    border-radius: 1vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #00eef0;
+    font-size: 4vh;
+}
+
 .gameVowels {
     position: absolute;
     background-color: #191d4b;
@@ -115,8 +143,8 @@
 }
 
 .gameLetter {
-    width: 50px;
-    height: 50px;
+    width: 70px;
+    height: 70px;
     border: 0.5vh solid #00eef0;
     border-radius: 1vh;
     display: flex;
@@ -124,7 +152,7 @@
     align-items: center;
     cursor: pointer;
     color: #00eef0;
-    font-size: 3vh;
+    font-size: 4vh;
 }
 
 
@@ -167,11 +195,11 @@
 
 .screen {
     background-color: #00eef0;
-    width: 900px;
+    width: 1200px;
     border-radius: 3vh;
     text-align: center;
     color: #191d4b;
-    font-size: 2.5vh;
+    font-size: 4vh;
     font-weight: bold;
 }
 
@@ -192,8 +220,8 @@
 .cell {
     background: linear-gradient(180deg, rgba(67, 72, 125, 1) 0%, #272e76 100%);
     border-radius: 1vh;
-    width: 90px;
-    height: 90px;
+    width: 130px;
+    height: 130px;
     border: 1px solid #515475;
     display: flex;
     justify-content: center;
@@ -300,6 +328,7 @@
     height: 50%;
     border-radius: 3vh;
     padding: 2vh;
+    transition: 2s;
 }
 
 .buyVowel {
@@ -321,6 +350,31 @@
     border-radius: 1.5vh;
     cursor: pointer;
     transition: 1s all;
+}
+
+.freeGameButton{
+    background-color: #191d4b;
+
+    border-width: 0.5vh;
+    border-color: #00eef0;
+
+    padding: 0.5vh 1vh;
+    color: #00eef0;
+    font-size: 2vh;
+    font-weight: bold;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    line-height: 1.2;
+    text-align: center;
+    border-radius: 1.5vh;
+    cursor: pointer;
+    transition: 1s all;
+}
+
+.freeGameButton:hover{
+    background-color: green;
 }
 
 .fadeDivBg {
@@ -365,6 +419,8 @@
     padding: 2vh;
     cursor: pointer;
     font-weight: bold;
+    font-size: 3vh;
+    transition: 2s;
 }
 
 .solveFade {

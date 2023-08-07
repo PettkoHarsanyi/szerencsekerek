@@ -2,14 +2,15 @@ import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { GameStage, Player, Riddle } from "../types";
 import { ImCross } from "react-icons/im";
 import { TiTick } from "react-icons/ti";
-import { addRound, setCurrentRiddle, setGameTable, setStage } from "@/redux/slices/gameSlice";
+import { addRound, setBackToSpin, setCurrentRiddle, setGameTable, setStage } from "@/redux/slices/gameSlice";
 import { useEffect, useState } from "react";
 import { setActualPlayer } from "@/redux/slices/actualPlayerSlice";
 import { riddles } from "../assets/riddles";
-import { modifyPlayer, resetRoundPoints, saveRoundPoints } from "@/redux/slices/playerSlice";
+import { modifyPlayer, resetRoundPoints, saveRoundPoints, setPlayers } from "@/redux/slices/playerSlice";
 import { modifySelf, setSolving } from "@/redux/slices/selfSlice";
+import { setFinished, setWon } from "@/redux/slices/endGameSlice";
 
-export default function Screen({ spinnedPrize }: any) {
+export default function Screen({ spinnedPrize ,setCanSpin}: any) {
     const game = useAppSelector(state => state.game)
     const players = useAppSelector(state => state.players);
     const actualPlayer = useAppSelector(state => state.actualPlayer);
@@ -18,6 +19,7 @@ export default function Screen({ spinnedPrize }: any) {
     const [gameRiddles, setGameRiddles] = useState<Riddle[]>(riddles); // A játékban szereplő feladványok
 
     const dispatch = useAppDispatch();
+
 
     // A játékképernyő betöltődésekor kell egy fade és egy véletlen feladvány
     useEffect(() => {
@@ -110,6 +112,8 @@ export default function Screen({ spinnedPrize }: any) {
         }
     }
 
+
+
     // Megfejtéskor a következő input fókusza
     const focusNextInput = (event: any) => {
         event.preventDefault();
@@ -145,7 +149,7 @@ export default function Screen({ spinnedPrize }: any) {
     // A feladvány megfejtése
     const solveRiddle = () => {
         const inputs: HTMLInputElement[] = Array.prototype.slice.call(document.querySelectorAll('.solveLetter'));
-        const alreadyGuessed: string[] = []
+        const alreadyGuessed: string[] = [];
 
         let index = 0;
         let indexInput = 0;
@@ -186,29 +190,48 @@ export default function Screen({ spinnedPrize }: any) {
 
             document.getElementById("gameBoard")?.animate([{ backgroundColor: "green" }, { backgroundColor: "#191d4b" }, { backgroundColor: "green" }, { backgroundColor: "#191d4b" }, { backgroundColor: "green" }, { backgroundColor: "#191d4b" }, { backgroundColor: "green" }, { backgroundColor: "#191d4b" }], 2000)
 
-            if (isNaN(spinnedPrize as number)) {
-                addPrizeToPlayer(200000, 1)
-            } else {
-                addPrizeToPlayer(200000 + (spinnedPrize as number), 1)
+            if (game.stage !== GameStage.ENDGAME_SOLVING) {
+                if (isNaN(spinnedPrize as number)) {
+                    addPrizeToPlayer(200000, 1)
+                } else {
+                    addPrizeToPlayer(200000 + (spinnedPrize as number), 1)
+                }
             }
 
+            if (game.stage === GameStage.ENDGAME_SOLVING) {
+                dispatch(setFinished());
+                dispatch(setStage(GameStage.OVER));
+                dispatch(setSolving(false))
+                dispatch(setWon(true));
+            } else {
 
-            setTimeout(() => {
-                if(game.round<3){
-                    dispatch(saveRoundPoints());
-                    dispatch(resetRoundPoints())
-                    console.log("NAGEC, MOST IS LEFUTOTTAM HEJJ");
-                }
-                dispatch(setStage(GameStage.PLACEMENT));
-                dispatch(addRound());
-            }, 2000)
-            setTimeout(() => {
-                const randomRiddle = pickRandomRiddle()
-                displayRidde(randomRiddle);
-            }, 3500);
+                setTimeout(() => {
+                    if (game.round < 3) {
+                        dispatch(saveRoundPoints());
+                        dispatch(resetRoundPoints())
+                    }
+                    if (game.round === 4 || game.round >4) { // HA AZ ENDGAME KÖVETKEZIK
+                        dispatch(setStage(GameStage.ENDGAME_SPINNING))
+                        dispatch(addRound()); // MAYBE UNNECCESSARY
+                        setCanSpin(true);
+                        setTimeout(() => {
+                            const randomRiddle = pickRandomRiddle()
+                            displayRidde(randomRiddle);
+                        }, 1500);
+                    } else {
+                        dispatch(setStage(GameStage.PLACEMENT));
+                        dispatch(addRound());
+                        setTimeout(() => {
+                            const randomRiddle = pickRandomRiddle()
+                            displayRidde(randomRiddle);
+                        }, 1500);
+                    }
+                }, 2000)
 
-            dispatch(setGameTable(_gameTable));
-            dispatch(setSolving(false))
+                dispatch(setGameTable(_gameTable));
+                dispatch(setSolving(false))
+
+            }
 
 
         } else {
@@ -222,23 +245,28 @@ export default function Screen({ spinnedPrize }: any) {
 
             document.getElementById("gameBoard")?.animate([{ backgroundColor: "red" }, { backgroundColor: "#191d4b" }, { backgroundColor: "red" }, { backgroundColor: "#191d4b" }, { backgroundColor: "red" }, { backgroundColor: "#191d4b" }, { backgroundColor: "red" }, { backgroundColor: "#191d4b" }], 2000)
 
-            const toModify: Player = { ...actualPlayer, points: 0 }
-            dispatch(modifyPlayer(toModify))
-            dispatch(modifySelf(toModify));
 
-            const currentPlayerIndex = players.findIndex((player) => player.id === actualPlayer.id);
-            dispatch(setActualPlayer(players[(currentPlayerIndex + 1) % players.length]))
+            if (game.stage !== GameStage.ENDGAME_SOLVING) {
 
-            setTimeout(() => {
-                dispatch(setStage(GameStage.SPINNING))
-            }, 2000)
+                const toModify: Player = { ...actualPlayer, points: 0 }
+                dispatch(modifyPlayer(toModify))
+                dispatch(modifySelf(toModify));
 
-            dispatch(setSolving(false));
+                const currentPlayerIndex = players.findIndex((player) => player.id === actualPlayer.id);
+                dispatch(setActualPlayer(players[(currentPlayerIndex + 1) % players.length]))
+
+                setTimeout(() => {
+                    dispatch(setStage(GameStage.SPINNING))
+                }, 2000)
+
+                dispatch(setSolving(false));
+            }
+
         }
     }
 
     return (
-        <div className="gamePanel" id="gamePanel" style={{ transform: game.stage === GameStage.GUESSING ? "translate(-50%,0)" : "translate(-50%,-150%)" }}>
+        <div className="gamePanel" id="gamePanel" style={{ transform: game.stage === GameStage.GUESSING || game.stage === GameStage.ENDGAME_SOLVING ? "translate(-50%,0)" : "translate(-50%,-150%)" }}>
             <div className="gameTitle">
                 <div className="screen">
                     {game.currentRiddle?.title.toUpperCase()}
@@ -261,7 +289,7 @@ export default function Screen({ spinnedPrize }: any) {
                 </div>
             </div>
             <div className="solveButtonsDiv" style={{ transform: self.isSolving ? "translate(-50%,100%)" : "translate(-50%,0)" }}>
-                <div className="solveButton" style={{ color: "red" }} onClick={() => { dispatch(setSolving(false)) }}><ImCross /></div>
+                <div className="solveButton" style={{ color: "red" }} onClick={() => { dispatch(setSolving(false)); if(game.backToSpin){dispatch(setBackToSpin(false));dispatch(setStage(GameStage.SPINNING))} }}><ImCross /></div>
                 <div className="solveText">Írd be a teljes megfejtést, majd a pipával okézd le.<br />Ha rossz a megfejtés, lenullázódsz.</div>
                 <div className="solveButton" style={{ color: "green" }} onClick={() => { solveRiddle() }}><TiTick /></div>
             </div>

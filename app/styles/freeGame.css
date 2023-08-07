@@ -1,0 +1,67 @@
+.freeGame{
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.822);
+    z-index: 100;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.freeGameInnerDiv{
+    width: min-content;
+    background-color: #191d4b;
+    border: 1vh solid #00eef0;
+    border-radius: 3vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+}
+
+.fgTitle{
+    padding: 4vh;
+    text-align: center;
+    background-color: #00eef0;
+    color: #191d4b;
+    font-weight: bold;
+    font-size: 4vh;
+    white-space: nowrap;
+}
+
+.fgText{
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 3vh;
+    padding: 4vh;
+}
+
+.fgButtons{
+    width: 100%;
+    display: flex;
+    justify-content: space-around;
+    padding: 4vh;
+}
+
+.fgButton{
+    border: 0.8vh solid #00eef0;
+    padding: 1vh 2vh;
+    font-size: 5vh;
+    border-radius: 2vh;
+    cursor: pointer;
+    color: #00eef0;
+    font-weight: bold;
+}
+
+.fgPlay:hover{
+    background-color: #008000;
+}
+
+.fgBack:hover{
+    background-color: #00818373;
+}

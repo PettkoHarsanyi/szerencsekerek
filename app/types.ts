@@ -25,6 +25,8 @@ export type Game = {
     stage: GameStage,
     currentRiddle: Riddle,
     gameTable: BoardCell[][],
+    backToSpin: boolean,
+    freeGame: boolean,
 }
 
 export type BoardCell = {
@@ -44,6 +46,18 @@ export enum GameStage {
     PLACEMENT,
     SPINNING,
     GUESSING,
-    ENDGAME,
+    ENDGAME_SPINNING,
+    ENDGAME_PICKING,
+    ENDGAME_SOLVING,
+    OVER,
     PAUSE
+}
+
+export type EndGame = {
+    player: Player | {},
+    pickedLetters: String[],
+    started: boolean,
+    finished: boolean,
+    won: Boolean,
+    endGameValue: number
 }

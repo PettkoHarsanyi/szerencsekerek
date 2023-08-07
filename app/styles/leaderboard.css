@@ -1,0 +1,27 @@
+.leaderboard{
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.963);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: absolute;
+    z-index: 1000;
+    opacity: 1;
+    transition: 4s all !important;
+}
+
+.endGameDivDiv{
+    padding: 10vh;
+    background-color: #191d4b;
+    border: 1vh solid #00eef0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #00eef0;
+    font-size: 6vh;
+    text-align: center;
+    border-radius: 3vh;
+    opacity: 1;
+    transition: 4s all !important;
+}

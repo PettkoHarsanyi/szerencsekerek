@@ -8,6 +8,9 @@ export const players = createSlice({
   initialState,
   reducers: {
     reset: () => initialState,
+    setPlayers: (state, action: PayloadAction<Player[]>) => {
+      return action.payload;
+    },
     addPlayer: (state, action: PayloadAction<string>) => {
       const name = action.payload;
       state.push({ id: state.length, name, points: 0, isSolving: false, totalPoints: 0,spinnedPlacement: false, placementPoints: 0})
@@ -49,6 +52,7 @@ export const players = createSlice({
 });
 
 export const {
+  setPlayers,
   addPlayer,
   removePlayer,
   modifyPlayer,
