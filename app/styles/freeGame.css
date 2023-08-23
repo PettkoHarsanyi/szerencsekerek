@@ -9,6 +9,8 @@
     display: flex;
     justify-content: center;
     align-items: center;
+    opacity: 0;
+    transition: 2s all ease;
 }
 
 .freeGameInnerDiv{
@@ -20,6 +22,7 @@
     flex-direction: column;
     justify-content: flex-start;
     align-items: center;
+    position: relative;
 }
 
 .fgTitle{
@@ -30,6 +33,16 @@
     font-weight: bold;
     font-size: 4vh;
     white-space: nowrap;
+}
+
+.fgGameName{
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 4vh;
+    font-weight: bold;
+    padding: 4vh 0 0 0;
 }
 
 .fgText{
@@ -64,4 +77,25 @@
 
 .fgBack:hover{
     background-color: #00818373;
+}
+
+.fgGameButton{
+    font-size: 4vh;
+    border: 0.5vh solid;
+    border-radius: 2vh;
+    padding: 1vh 3vh;
+    cursor: pointer;
+}
+
+.otherGame{
+    background-color: white;
+    color: rgb(17, 17, 17);
+    position: absolute;
+    right: -300px;
+    top: 50%;
+    padding: 2vh;
+    font-weight: bold;
+    border-radius: 2vh;
+    font-size: 2vh;
+    cursor: pointer;
 }

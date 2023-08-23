@@ -28,6 +28,7 @@ export default function Game() {
     const [canSpin, setCanSpin] = useState(true);   // Pörgethető e a kerék
     const ENDLETTERS = ["N", "R", "T", "L", "K", "E", "?", "?", "?", "?"]
     const [endGameLetters, setEndGameLetters] = useState(ENDLETTERS);
+    const [vovelsShown, setVovelsShown] = useState(false);  // A magánhangzók mutatva vannak-e
 
     useEffect(() => {
         window.history.pushState(null, document.title, window.location.href);
@@ -55,7 +56,7 @@ export default function Game() {
             <div id="fadeOutDiv" className="fadeOutDark"></div>
             <div className="solveFade" id="solveFade" style={{ opacity: self.isSolving ? "0.9" : "0" }} />
             <Swap isSwapping={isSwapping} setIsSwapping={setIsSwapping} setCanSpin={setCanSpin} />
-            <Desk spinnedPrize={spinnedPrize} screenShown={screenShown} endGameLetters={endGameLetters} />
+            <Desk spinnedPrize={spinnedPrize} screenShown={screenShown} endGameLetters={endGameLetters} vovelsShown={vovelsShown} setVovelsShown={setVovelsShown}/>
             <PickLetters />
             <Screen spinnedPrize={spinnedPrize} setCanSpin={setCanSpin} />
             <Wheel setScreenShown={setScreenShown} setSpinnedPrize={setSpinnedPrize} setIsSwapping={setIsSwapping} canSpin={canSpin} setCanSpin={setCanSpin} />
@@ -66,7 +67,7 @@ export default function Game() {
                 :
                 ""
             }
-            <FreeGame />
+            <FreeGame setVovelsShown={setVovelsShown}/>
         </div >
     )
 }

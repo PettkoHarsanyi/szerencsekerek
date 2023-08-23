@@ -8,7 +8,7 @@ import { modifySelf, setSolving } from "@/redux/slices/selfSlice";
 import { HiOutlineShoppingCart } from "react-icons/hi";
 import { startEndGame } from "@/redux/slices/endGameSlice";
 
-export default function Desk({ spinnedPrize, screenShown, endGameLetters }: any) {
+export default function Desk({ spinnedPrize, screenShown, endGameLetters, vovelsShown, setVovelsShown }: any) {
     const CONSONANTS = ["b", "c", "d", "f", "g", "h", "j", "k", "l", "m", "n", "p", "r", "s", "t", "v", "y", "z"];
     const VOWELS = ["a", "á", "e", "é", "i", "í", "u", "ú", "ü", "ű", "o", "ó", "ö", "ő"];
     const VOVELPRICE = 100000;
@@ -20,7 +20,6 @@ export default function Desk({ spinnedPrize, screenShown, endGameLetters }: any)
     const endGame = useAppSelector(state => state.endGame)
 
     const [canGuess, setCanGuess] = useState(false);    // Tippelést engedi / tiltja
-    const [vovelsShown, setVovelsShown] = useState(false);  // A magánhangzók mutatva vannak-e
     const [roundConsonants, setRoundConsonants] = useState(CONSONANTS); // Az aktuális kör mássalhangzói
     const [roundVowels, setRoundVowels] = useState(VOWELS); // Az aktuális kör magánhangzói
     const dispatch = useAppDispatch();
@@ -225,7 +224,7 @@ export default function Desk({ spinnedPrize, screenShown, endGameLetters }: any)
                             <div>AÁ</div>
                             <div>100.000</div>
                         </div>
-                        <div id="freeGameDiv" className="s" onClick={()=>dispatch(setFreeGame(true))}>
+                        <div id="freeGameDiv" className="freeGameButton" onClick={()=>dispatch(setFreeGame(true))}>
                             <div>JÁTÉK</div>
                             <div>INGYEN</div>
                         </div>
